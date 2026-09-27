@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick-Broker Design Preview</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #faf9f7; color: #2d3436; padding: 20px; }
+h1 { text-align: center; margin-bottom: 8px; font-size: 24px; color: #495057; }
+.subtitle { text-align: center; color: #6c757d; margin-bottom: 30px; font-size: 14px; }
+.screens { display: flex; flex-wrap: wrap; gap: 20px; justify-content: center; }
+.screen { background: #ffffff; border-radius: 24px; width: 300px; height: 560px; overflow: hidden; border: 3px solid #495057; position: relative; box-shadow: 0 8px 32px rgba(73, 80, 87, 0.15); }
+.screen-label { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: #495057; padding: 4px 12px; border-radius: 12px; font-size: 11px; color: #fff; font-weight: 600; z-index: 10; white-space: nowrap; }
+.status-bar { height: 28px; background: #2d3436; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; font-size: 11px; color: #fff; }
+.app-bar { background: linear-gradient(135deg, #495057, #6c757d); padding: 12px 16px; display: flex; align-items: center; gap: 12px; }
+.app-bar .logo { width: 28px; height: 28px; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.app-bar .title { font-size: 16px; font-weight: 700; color: #fff; }
+.app-bar .menu { margin-left: auto; font-size: 20px; color: #fff; }
+.content { padding: 12px; }
+.search-bar { display: flex; gap: 8px; margin-bottom: 12px; }
+.search-bar input { flex: 1; padding: 10px 14px; border-radius: 12px; border: 2px solid #ede8e4; background: #fff; color: #2d3436; font-size: 13px; outline: none; }
+.search-bar input:focus { border-color: #495057; }
+.search-bar input::placeholder { color: #b8b0a8; }
+.search-bar button { padding: 10px 14px; border-radius: 12px; border: none; background: #495057; color: #fff; font-size: 13px; cursor: pointer; font-weight: 600; }
+.filters { display: flex; gap: 6px; margin-bottom: 12px; overflow-x: auto; padding-bottom: 4px; }
+.filter-chip { padding: 6px 12px; border-radius: 20px; font-size: 11px; white-space: nowrap; background: #faf9f7; border: 1px solid #ede8e4; color: #8a8178; }
+.filter-chip.active { background: #495057; border-color: #495057; color: #fff; }
+.listing-card { background: #fff; border-radius: 16px; overflow: hidden; margin-bottom: 12px; border: 1px solid #ede8e4; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.listing-img { height: 120px; background: linear-gradient(135deg, #495057, #6c757d); display: flex; align-items: center; justify-content: center; font-size: 32px; }
+.listing-info { padding: 12px; }
+.listing-info .type { font-size: 13px; font-weight: 700; color: #2d3436; }
+.listing-info .rent { font-size: 15px; font-weight: 700; color: #495057; margin-top: 2px; }
+.listing-info .distance { font-size: 11px; color: #8a8178; margin-top: 2px; }
+.listing-info .details { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+.listing-info .detail-tag { font-size: 10px; padding: 3px 8px; border-radius: 8px; background: #f1f3f5; color: #6c757d; }
+.listing-info .verified { display: flex; align-items: center; gap: 4px; margin-top: 8px; font-size: 10px; color: #5cb85c; font-weight: 600; }
+.btn { display: block; width: 100%; padding: 12px; border-radius: 12px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; }
+.btn-primary { background: #495057; color: #fff; }
+.btn-outline { background: #fff; border: 2px solid #495057; color: #495057; margin-top: 8px; }
+.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; display: flex; justify-content: space-around; padding: 10px 0; border-top: 1px solid #ede8e4; }
+.bottom-nav .nav-item { text-align: center; font-size: 10px; color: #b8b0a8; }
+.bottom-nav .nav-item.active { color: #495057; }
+.bottom-nav .nav-icon { font-size: 18px; display: block; margin-bottom: 2px; }
+.detail-img { height: 180px; background: linear-gradient(135deg, #495057, #6c757d); display: flex; align-items: center; justify-content: center; font-size: 48px; }
+.detail-body { padding: 16px; }
+.detail-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; color: #2d3436; }
+.detail-rent { font-size: 20px; font-weight: 700; color: #495057; margin-bottom: 8px; }
+.detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #faf9f7; font-size: 13px; }
+.detail-row .label { color: #8a8178; }
+.detail-row .value { color: #2d3436; font-weight: 500; }
+.otp-inputs { display: flex; gap: 10px; justify-content: center; margin: 24px 0; }
+.otp-box { width: 48px; height: 48px; border-radius: 12px; border: 2px solid #ede8e4; background: #fff; color: #2d3436; text-align: center; font-size: 20px; font-weight: 700; outline: none; }
+.otp-box:focus { border-color: #495057; }
+.code-display { text-align: center; padding: 40px 20px; }
+.code-display .code { font-size: 48px; font-weight: 700; letter-spacing: 12px; color: #495057; margin: 20px 0; }
+.code-display .label { font-size: 13px; color: #8a8178; }
+.action-buttons { display: flex; gap: 12px; margin-top: 16px; }
+.action-buttons .btn { flex: 1; }
+.btn-available { background: #5cb85c; color: #fff; }
+.btn-occupied { background: #b8b0a8; color: #8a8178; }
+.stars { color: #f0ad4e; font-size: 18px; letter-spacing: 4px; }
+.section-title { font-size: 12px; font-weight: 700; color: #8a8178; text-transform: uppercase; margin: 16px 0 8px; letter-spacing: 1px; }
+.review-card { background: #faf9f7; border-radius: 12px; padding: 12px; margin-bottom: 8px; border: 1px solid #ede8e4; }
+.review-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.review-card .name { font-size: 13px; font-weight: 600; color: #2d3436; }
+.review-card .comment { font-size: 12px; color: #8a8178; line-height: 1.4; }
+.tag { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 11px; margin-right: 6px; margin-bottom: 4px; }
+.tag-green { background: #e8f5e9; color: #5cb85c; }
+.tag-orange { background: #f1f3f5; color: #6c757d; }
+.tag-warm { background: #f1f3f5; color: #495057; }
+</style>
+</head>
+<body>
+
+<h1>Quick-Broker</h1>
+<p class="subtitle">Design Preview — Mobile-First PWA</p>
+
+<div class="screens">
+
+<!-- Screen 1: Landing / Browse -->
+<div class="screen">
+  <div class="screen-label">1. LANDING / BROWSE</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">Quick-Broker</span>
+    <span class="menu">⋯</span>
+  </div>
+  <div class="content">
+    <div class="search-bar">
+      <input type="text" placeholder="Search area, house type...">
+      <button>Search</button>
+    </div>
+    <div class="filters">
+      <span class="filter-chip active">All</span>
+      <span class="filter-chip">Single</span>
+      <span class="filter-chip">Double</span>
+      <span class="filter-chip">Self-Cont.</span>
+      <span class="filter-chip">&lt; 300k</span>
+    </div>
+    <div class="listing-card">
+      <div class="listing-img">🏠</div>
+      <div class="listing-info">
+        <div class="type">Double Room</div>
+        <div class="rent">UGX 280,000/month</div>
+        <div class="distance">1.2 km from KIU · ~8 min boda</div>
+        <div class="details">
+          <span class="detail-tag">Kitchen</span>
+          <span class="detail-tag">Shared Bath</span>
+          <span class="detail-tag">Shared WC</span>
+        </div>
+        <div class="verified">✓ Identity Verified</div>
+      </div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-img">🏡</div>
+      <div class="listing-info">
+        <div class="type">Self-Contained Single</div>
+        <div class="rent">UGX 350,000/month</div>
+        <div class="distance">800 m from KIU · ~5 min boda</div>
+        <div class="details">
+          <span class="detail-tag">Kitchen</span>
+          <span class="detail-tag">Private Bath</span>
+          <span class="detail-tag">Tiled</span>
+        </div>
+        <div class="verified">✓ Identity Verified</div>
+      </div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-img">🏢</div>
+      <div class="listing-info">
+        <div class="type">Single Room</div>
+        <div class="rent">UGX 180,000/month</div>
+        <div class="distance">2.5 km from KIU · ~15 min boda</div>
+        <div class="details">
+          <span class="detail-tag">No Kitchen</span>
+          <span class="detail-tag">Shared Bath</span>
+        </div>
+        <div class="verified">✓ Identity Verified</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item active"><span class="nav-icon">🏠</span>Home</div>
+    <div class="nav-item"><span class="nav-icon">❤️</span>Saved</div>
+    <div class="nav-item"><span class="nav-icon">⚖️</span>Compare</div>
+    <div class="nav-item"><span class="nav-icon">📋</span>Inspect</div>
+    <div class="nav-item"><span class="nav-icon">👤</span>Profile</div>
+  </div>
+</div>
+
+<!-- Screen 2: Listing Detail -->
+<div class="screen">
+  <div class="screen-label">2. LISTING DETAIL</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">Listing Details</span>
+    <span class="menu">❤️ ↗️</span>
+  </div>
+  <div class="detail-img">🏠</div>
+  <div class="detail-body">
+    <div class="detail-title">Double Room — Kakoba</div>
+    <div class="detail-rent">UGX 280,000/month</div>
+    
+    <div class="section-title">Location & Transport</div>
+    <div class="detail-row"><span class="label">Distance from KIU</span><span class="value">1.2 km</span></div>
+    <div class="detail-row"><span class="label">Boda time</span><span class="value">~8 minutes</span></div>
+    <div class="detail-row"><span class="label">Walking time</span><span class="value">~15 minutes</span></div>
+    
+    <div class="section-title">Facilities</div>
+    <div class="detail-row"><span class="label">Kitchen</span><span class="value">Present</span></div>
+    <div class="detail-row"><span class="label">Bathroom</span><span class="value">Shared</span></div>
+    <div class="detail-row"><span class="label">Toilet</span><span class="value">Shared</span></div>
+    <div class="detail-row"><span class="label">Flooring</span><span class="value">Tiled</span></div>
+    
+    <div class="section-title">Utilities</div>
+    <div class="detail-row"><span class="label">Electricity</span><span class="value">Shared bill</span></div>
+    <div class="detail-row"><span class="label">Water</span><span class="value">Community tap</span></div>
+    
+    <div class="section-title">Status</div>
+    <div><span class="tag tag-green">✓ Available</span><span class="tag tag-warm">✓ Verified Landlord</span></div>
+    
+    <div style="margin-top: 16px;">
+      <button class="btn btn-primary">📅 Request Inspection</button>
+      <button class="btn btn-outline">📞 Call Landlord</button>
+      <button class="btn btn-outline">💬 WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 3: Login -->
+<div class="screen">
+  <div class="screen-label">3. EMAIL LOGIN</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">Quick-Broker</span>
+    <span class="menu"></span>
+  </div>
+  <div class="content" style="padding: 30px 20px;">
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 40px;">
+      <div style="font-size: 48px; margin-bottom: 16px;">🏠</div>
+      <h2 style="font-size: 22px; margin-bottom: 8px; color: #2d3436;">Welcome Back</h2>
+      <p style="font-size: 13px; color: #8a8178;">Enter your email to receive a login code</p>
+    </div>
+    <input type="email" placeholder="your@email.com" style="width: 100%; padding: 14px 16px; border-radius: 12px; border: 2px solid #ede8e4; background: #fff; color: #2d3436; font-size: 14px; outline: none; margin-bottom: 16px;">
+    <button class="btn btn-primary">Send Login Code</button>
+    <p style="text-align: center; font-size: 11px; color: #b8b0a8; margin-top: 16px;">We'll email you a 6-digit code to verify your account.</p>
+  </div>
+</div>
+
+<!-- Screen 4: OTP Verification -->
+<div class="screen">
+  <div class="screen-label">4. OTP VERIFICATION</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">Verify Email</span>
+    <span class="menu"></span>
+  </div>
+  <div class="content" style="padding: 30px 20px;">
+    <div style="text-align: center; margin-top: 40px; margin-bottom: 30px;">
+      <div style="font-size: 36px; margin-bottom: 12px;">📧</div>
+      <h2 style="font-size: 20px; margin-bottom: 6px; color: #2d3436;">Check Your Email</h2>
+      <p style="font-size: 13px; color: #8a8178;">Enter the 6-digit code sent to your@email.com</p>
+    </div>
+    <div class="otp-inputs">
+      <input class="otp-box" value="4" maxlength="1">
+      <input class="otp-box" value="8" maxlength="1">
+      <input class="otp-box" value="3" maxlength="1">
+      <input class="otp-box" value="9" maxlength="1">
+      <input class="otp-box" value="2" maxlength="1">
+      <input class="otp-box" value="0" maxlength="1">
+    </div>
+    <button class="btn btn-primary">Verify & Login</button>
+    <p style="text-align: center; font-size: 12px; color: #8a8178; margin-top: 16px;">Didn't receive it? <span style="color: #495057;">Resend code</span></p>
+  </div>
+</div>
+
+<!-- Screen 5: Inspection Code -->
+<div class="screen">
+  <div class="screen-label">5. INSPECTION CODE</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">Inspection Code</span>
+    <span class="menu"></span>
+  </div>
+  <div class="code-display">
+    <div class="label">Show this code to the landlord</div>
+    <div class="code">483920</div>
+    <div class="label">Expires in 23:45:12</div>
+    <div style="margin-top: 30px; padding: 0 20px;">
+      <div class="review-card" style="text-align: left;">
+        <div class="name">Double Room — Kakoba</div>
+        <div style="font-size: 11px; color: #8a8178; margin-top: 4px;">Tomorrow, 10:00 AM · 1.2 km from KIU</div>
+      </div>
+      <button class="btn btn-primary" style="margin-top: 16px;">📞 Call Landlord</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 6: Reviews -->
+<div class="screen">
+  <div class="screen-label">6. REVIEWS</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">Reviews</span>
+    <span class="menu"></span>
+  </div>
+  <div class="detail-body">
+    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+      <div>
+        <div style="font-size: 16px; font-weight: 700; color: #2d3436;">Double Room — Kakoba</div>
+        <div class="stars">★★★★★</div>
+      </div>
+      <div style="margin-left: auto; text-align: right;">
+        <div style="font-size: 24px; font-weight: 700; color: #495057;">4.6</div>
+        <div style="font-size: 11px; color: #8a8178;">12 reviews</div>
+      </div>
+    </div>
+    
+    <div class="section-title">Rating Breakdown</div>
+    <div class="detail-row"><span class="label">Accuracy</span><span class="value">★★★★☆</span></div>
+    <div class="detail-row"><span class="label">Water</span><span class="value">★★★☆☆</span></div>
+    <div class="detail-row"><span class="label">Electricity</span><span class="value">★★★★★</span></div>
+    <div class="detail-row"><span class="label">Location</span><span class="value">★★★★★</span></div>
+    
+    <div class="section-title">Recent Reviews</div>
+    <div class="review-card">
+      <div class="header"><span class="name">Sarah K.</span><span class="stars">★★★★★</span></div>
+      <div class="comment">Accurate listing. Water is reliable and the landlord is great. Close to campus!</div>
+    </div>
+    <div class="review-card">
+      <div class="header"><span class="name">John M.</span><span class="value">★★★★☆</span></div>
+      <div class="comment">Good value. Electricity is shared but works well. Boda ride is quick.</div>
+    </div>
+    <div class="review-card">
+      <div class="header"><span class="name">Grace A.</span><span class="value">★★★★★</span></div>
+      <div class="comment">Exactly as described. Safe area, friendly neighbors. Highly recommend!</div>
+    </div>
+    
+    <div style="margin-top: 16px;">
+      <button class="btn btn-primary">✍️ Write a Review</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 7: Compare -->
+<div class="screen">
+  <div class="screen-label">7. COMPARE HOUSES</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">Compare Houses</span>
+    <span class="menu"></span>
+  </div>
+  <div class="content" style="overflow-x: auto;">
+    <table style="width: 100%; border-collapse: collapse; font-size: 12px; min-width: 280px;">
+      <thead>
+        <tr>
+          <th style="text-align: left; padding: 8px; color: #8a8178; border-bottom: 2px solid #495057;">Feature</th>
+          <th style="padding: 8px; border-bottom: 2px solid #495057;">🏠 A</th>
+          <th style="padding: 8px; border-bottom: 2px solid #495057;">🏡 B</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td style="padding: 8px; color: #8a8178;">Rent</td><td style="padding: 8px; text-align: center; color: #495057; font-weight: 700;">280k</td><td style="padding: 8px; text-align: center; color: #495057; font-weight: 700;">350k</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Distance</td><td style="padding: 8px; text-align: center;">1.2 km</td><td style="padding: 8px; text-align: center;">800 m</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Boda Time</td><td style="padding: 8px; text-align: center;">8 min</td><td style="padding: 8px; text-align: center;">5 min</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Type</td><td style="padding: 8px; text-align: center;">Double</td><td style="padding: 8px; text-align: center;">Self-Cont.</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Kitchen</td><td style="padding: 8px; text-align: center;">✅</td><td style="padding: 8px; text-align: center;">✅</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Bathroom</td><td style="padding: 8px; text-align: center;">Shared</td><td style="padding: 8px; text-align: center;">Private</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Toilet</td><td style="padding: 8px; text-align: center;">Shared</td><td style="padding: 8px; text-align: center;">Private</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Electricity</td><td style="padding: 8px; text-align: center;">Shared</td><td style="padding: 8px; text-align: center;">Personal</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Water</td><td style="padding: 8px; text-align: center;">Community</td><td style="padding: 8px; text-align: center;">Included</td></tr>
+        <tr><td style="padding: 8px; color: #8a8178;">Rating</td><td style="padding: 8px; text-align: center;">★★★★★ 4.6</td><td style="padding: 8px; text-align: center;">★★★★☆ 4.2</td></tr>
+      </tbody>
+    </table>
+    <div style="display: flex; gap: 8px; margin-top: 12px;">
+      <button class="btn btn-primary" style="flex: 1;">📅 Inspect A</button>
+      <button class="btn btn-primary" style="flex: 1;">📅 Inspect B</button>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 8: Saved Houses -->
+<div class="screen">
+  <div class="screen-label">8. SAVED HOUSES</div>
+  <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+  <div class="app-bar">
+    <div class="logo">QB</div>
+    <span class="title">My Saved Houses</span>
+    <span class="menu"></span>
+  </div>
+  <div class="content">
+    <div class="listing-card">
+      <div class="listing-img">🏠</div>
+      <div class="listing-info">
+        <div class="type">Double Room — Kakoba</div>
+        <div class="rent">UGX 280,000/month</div>
+        <div class="distance">1.2 km from KIU · ~8 min boda</div>
+        <div class="verified">✓ Identity Verified</div>
+      </div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-img">🏡</div>
+      <div class="listing-info">
+        <div class="type">Self-Contained Single</div>
+        <div class="rent">UGX 350,000/month</div>
+        <div class="distance">800 m from KIU · ~5 min boda</div>
+        <div class="verified">✓ Identity Verified</div>
+      </div>
+    </div>
+    <div class="listing-card">
+      <div class="listing-img">🏢</div>
+      <div class="listing-info">
+        <div class="type">Single Room — Ishaka Town</div>
+        <div class="rent">UGX 180,000/month</div>
+        <div class="distance">2.5 km from KIU · ~15 min boda</div>
+        <div class="verified">✓ Identity Verified</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-nav">
+    <div class="nav-item"><span class="nav-icon">🏠</span>Home</div>
+    <div class="nav-item active"><span class="nav-icon">❤️</span>Saved</div>
+    <div class="nav-item"><span class="nav-icon">⚖️</span>Compare</div>
+    <div class="nav-item"><span class="nav-icon">📋</span>Inspect</div>
+    <div class="nav-item"><span class="nav-icon">👤</span>Profile</div>
+  </div>
+</div>
+
+</div>
+
+<div style="text-align: center; margin-top: 30px; padding: 20px;">
+  <p style="color: #8a8178; font-size: 13px;">Open this file in your browser to see the design</p>
+  <p style="color: #b8b0a8; font-size: 12px; margin-top: 8px;">8 screens shown: Landing, Detail, Login, OTP, Inspection Code, Reviews, Compare, Saved</p>
+</div>
+
+</body>
+</html>

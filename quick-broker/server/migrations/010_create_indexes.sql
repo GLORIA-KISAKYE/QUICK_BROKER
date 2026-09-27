@@ -1,0 +1,9 @@
+CREATE INDEX idx_listings_status ON listings(status);
+CREATE INDEX idx_listings_area ON listings(area);
+CREATE INDEX idx_listings_rent ON listings(rent_amount);
+CREATE INDEX idx_listings_distance ON listings(distance_from_kiu);
+CREATE INDEX idx_inspections_student ON inspections(student_id);
+CREATE INDEX idx_inspections_listing ON inspections(listing_id);
+CREATE INDEX idx_reviews_listing ON reviews(listing_id);
+CREATE INDEX idx_saved_houses_student ON saved_houses(student_id);
+CREATE INDEX idx_reports_listing ON reports(listing_id);
