@@ -1464,3 +1464,116 @@ Is the house still available?
 
 Can I arrange an inspection?
 
+---
+
+## 27. Architecture & Design Decisions (v1 Implementation)
+
+**Date:** 2026-09-28
+**Status:** Implemented
+
+This section documents all architectural and design decisions made during implementation, including rationale for each change from the original PRD.
+
+---
+
+### 27.1 User & Access Changes
+
+| Decision | Original PRD | Implemented | Reason |
+|----------|-------------|-------------|--------|
+| **Landlord accounts** | Both students and landlords register | Students only — landlords are NOT users in v1 | Reduces complexity for MVP. Landlords are managed by admin; students contact landlords directly via phone/WhatsApp. This removes the need for landlord authentication, verification flows, and landlord dashboards. |
+| **Auth method** | Phone OTP (implied) | Email OTP (ZeptoMail) | Email OTP is free — no SMS costs (~$1–4/month saved). ZeptoMail sandbox mode requires no domain verification, keeping costs at $0/month. Trade-off: some students may not check email regularly; WhatsApp OTP can be added in v1.1. |
+| **User roles** | Student, Landlord | Student, Admin | Admin manages all listings on behalf of landlords. No landlord role needed in v1. |
+
+---
+
+### 27.2 Backend Architecture Changes
+
+| Decision | Original PRD | Implemented | Reason |
+|----------|-------------|-------------|--------|
+| **Backend framework** | Not specified | Node.js + Express | Same language as frontend (React) — one developer can build everything. Lightweight, fast to build, direct PostgreSQL queries. |
+| **Database** | Not specified | PostgreSQL (self-hosted on local device) | Full control, no vendor lock-in. Raw SQL queries. |
+| **ORM** | Not specified | **None** — raw SQL with `pg` (node-postgres) | User requirement. No abstraction layer — full control over queries, no ORM learning curve, no dependency bloat. |
+| **API style** | Not specified | REST (JSON) | Simple, well-understood, easy to test. Auto-generated from route definitions. |
+| **Authentication** | Not specified | JWT (access + refresh tokens) | Stateless, scalable, standard. Access token (15 min) + refresh token (7 days). Stored in httpOnly cookies for security. |
+
+---
+
+### 27.3 Storage & Infrastructure Changes
+
+| Decision | Original PRD | Implemented | Reason |
+|----------|-------------|-------------|--------|
+| **Image storage** | Not specified | Cloudflare R2 (S3-compatible) | User requirement. Free tier: 10GB storage, 10M requests/month. Zero egress fees — critical for a local server with limited bandwidth. Images delivered via Cloudflare CDN for fast access in Uganda. |
+| **Hosting** | Not specified | Local device (Raspberry Pi / old laptop) | User requirement. Zero monthly cost. Full control. Low latency for Ishaka users. No vendor lock-in. |
+| **Domain** | Not specified | DuckDNS (free subdomain) | Free dynamic DNS for changing home IP addresses. No custom domain cost (~$12/year saved). |
+| **SSL** | Not specified | Let's Encrypt + certbot | Free HTTPS certificates with auto-renewal. No SSL cost. |
+| **Dev environment** | Not specified | Docker Compose | One-command local development (`docker-compose up`). Same environment everywhere. Easy backup/reset. No version conflicts. |
+| **Production process** | Not specified | PM2 | Auto-restart on crash/reboot. Simple process management. Zero cost. |
+| **Cron jobs** | Not specified | node-cron | Periodic availability confirmation emails. Runs in-process, no external service needed. |
+
+---
+
+### 27.4 Frontend Changes
+
+| Decision | Original PRD | Implemented | Reason |
+|----------|-------------|-------------|--------|
+| **Framework** | Not specified | React 18 + Vite + Tailwind CSS | Fast development, mobile-first responsive, PWA-capable. |
+| **Mobile** | Not specified | PWA (Progressive Web App) | No app store friction. Works on any phone browser. Installable on Android/iOS. Zero app store fees. |
+| **Navigation** | Not specified | Bottom tab bar (Home, Saved, Compare, Inspections) | Mobile-first thumb-friendly navigation. |
+| **State management** | Not specified | React Context | Simple, no external dependency. Sufficient for auth state. |
+| **Styling** | Not specified | Tailwind CSS | Rapid development, consistent design system, small bundle. |
+
+---
+
+### 27.5 Cost Analysis
+
+| Item | Before | After | Savings |
+|------|--------|-------|---------|
+| SMS (Phone OTP) | ~$1–4/month | $0 | Email OTP is free |
+| Cloud hosting | ~$25–50/month | $0 | Local device hosting |
+| Domain | ~$12/year | $0 | DuckDNS free subdomain |
+| SSL certificate | ~$50–100/year | $0 | Let's Encrypt free |
+| Image storage | ~$5–10/month | $0 | Cloudflare R2 free tier |
+| **Total monthly** | **~$31–64/month** | **$0/month** | **100% savings** |
+
+---
+
+### 27.6 Trade-offs & Risks
+
+| Trade-off | Impact | Mitigation |
+|-----------|--------|------------|
+| No landlord accounts | Less self-service for landlords | Admin manages listings; landlords can call/WhatsApp to update |
+| Email OTP (no SMS) | Some students may not check email | Add WhatsApp OTP in v1.1 (free, requires WhatsApp Business API approval) |
+| Local hosting | Requires reliable internet + power | UPS for power backup; PM2 auto-restart; UptimeRobot alerts |
+| No ORM | More manual SQL code | Full control; `pg` library is mature and stable |
+| Home IP changes | DNS may be temporarily stale | DuckDNS auto-update client |
+
+---
+
+### 27.7 Future Improvements
+
+| Priority | Feature | Notes |
+|----------|---------|-------|
+| v1.1 | WhatsApp OTP | Secondary login method; requires WhatsApp Business API approval |
+| v1.1 | Landlord accounts | Self-service listing management; requires auth flow |
+| v1.2 | Real-time notifications | WebSocket for inspection status updates |
+| v1.2 | Featured listings | Paid promotional listings (monetization) |
+| v2.0 | Native mobile app | If PWA limitations become an issue |
+
+---
+
+### 27.8 Implementation Files
+
+| File | Purpose |
+|------|---------|
+| `IMPLEMENTATION_PLAN.md` | Full implementation plan (this document's companion) |
+| `design.html` | Static design preview (multi-screen) |
+| `quick-broker/preview.html` | Interactive single-page preview with tab navigation |
+| `quick-broker/docker-compose.yml` | Docker Compose for local development |
+| `quick-broker/.env.example` | Environment variable template |
+| `quick-broker/server/` | Backend source code (Express + pg) |
+| `quick-broker/server/migrations/` | Database migration files (001–013) |
+| `quick-broker/web/` | Frontend source code (React + Vite + Tailwind) |
+
+---
+
+*End of PRD v1.1 — Implementation Notes*
+
