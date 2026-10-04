@@ -37,10 +37,13 @@ export default function ListingCard({ listing }: Props) {
   return (
     <div
       onClick={() => navigate(`/listing/${listing.id}`)}
-      className="bg-white rounded-2xl overflow-hidden border border-border shadow-sm mb-3 cursor-pointer hover:shadow-md transition-shadow"
+      className="bg-white rounded-2xl overflow-hidden border border-border mb-3 cursor-pointer hover:shadow-md transition-shadow"
     >
-      <div className="h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-5xl">
+      <div className="h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-5xl relative">
         🏠
+        <div className="absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center text-sm shadow">
+          ❤️
+        </div>
       </div>
       <div className="p-3">
         <h3 className="font-bold text-sm text-text">{houseTypeLabel(listing.house_type)}</h3>

@@ -6,9 +6,9 @@ export default function BottomNav() {
 
   const items = [
     { path: '/', icon: '🏠', label: 'Home' },
-    { path: '/saved', icon: '❤️', label: 'Saved' },
-    { path: '/compare', icon: '⚖️', label: 'Compare' },
-    { path: '/inspections', icon: '📋', label: 'Inspect' },
+    { path: '/saved', icon: '🔍', label: 'Search' },
+    { path: '/inspections', icon: '🔔', label: 'Alerts' },
+    { path: '/saved', icon: '👤', label: 'Profile' },
   ];
 
   // Don't show on auth or admin pages

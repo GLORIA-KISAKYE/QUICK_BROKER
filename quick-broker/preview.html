@@ -6,71 +6,79 @@
 <title>Quick-Broker — Working Preview</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a2e; color: #fff; }
-.header { text-align: center; padding: 20px; }
-.header h1 { font-size: 24px; color: #495057; }
-.header p { color: #888; margin-top: 6px; font-size: 13px; }
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 10px 20px; }
-.tabs button { padding: 6px 14px; border: none; border-radius: 8px; background: #16213e; color: #495057; cursor: pointer; font-size: 12px; font-weight: 600; }
-.tabs button.active { background: #495057; color: #fff; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #1a1a1a; }
+.header { text-align: center; padding: 20px; background: #fff; }
+.header h1 { font-size: 22px; color: #1a1a1a; }
+.header p { color: #888; margin-top: 4px; font-size: 13px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 10px 20px; background: #fff; border-bottom: 1px solid #eee; }
+.tabs button { padding: 6px 14px; border: none; border-radius: 8px; background: #f5f5f5; color: #666; cursor: pointer; font-size: 12px; font-weight: 600; }
+.tabs button.active { background: #B07D4F; color: #fff; }
 .preview { display: flex; justify-content: center; padding: 20px; }
-.phone { width: 300px; height: 560px; background: #fff; border-radius: 24px; overflow: hidden; border: 3px solid #495057; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
-.status-bar { height: 24px; background: #212529; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 10px; color: #fff; }
-.app-bar { background: linear-gradient(135deg, #495057, #6c757d); padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
-.app-bar .logo { width: 24px; height: 24px; background: #fff; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
-.app-bar .title { font-size: 14px; font-weight: 700; color: #fff; }
-.app-bar .menu { margin-left: auto; font-size: 16px; color: #fff; }
-.content { padding: 10px; background: #f8f9fa; height: calc(100% - 44px); overflow-y: auto; }
+.phone { width: 300px; height: 560px; background: #fff; border-radius: 24px; overflow: hidden; border: 3px solid #B07D4F; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+.status-bar { height: 24px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 10px; color: #1a1a1a; }
+.app-bar { background: #fff; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f0f0; }
+.app-bar .logo { width: 28px; height: 28px; background: #B07D4F; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 700; }
+.app-bar .title { font-size: 15px; font-weight: 700; color: #1a1a1a; }
+.app-bar .menu { margin-left: auto; font-size: 16px; color: #666; }
+.content { padding: 10px; background: #f5f5f5; height: calc(100% - 44px); overflow-y: auto; }
 .search-bar { display: flex; gap: 6px; margin-bottom: 10px; }
-.search-bar input { flex: 1; padding: 8px 12px; border-radius: 10px; border: 1.5px solid #dee2e6; background: #fff; color: #212529; font-size: 12px; outline: none; }
-.search-bar button { padding: 8px 12px; border-radius: 10px; border: none; background: #495057; color: #fff; font-size: 12px; cursor: pointer; font-weight: 600; }
+.search-bar input { flex: 1; padding: 8px 12px; border-radius: 20px; border: 1.5px solid #e0e0e0; background: #fff; color: #1a1a1a; font-size: 12px; outline: none; }
+.search-bar input:focus { border-color: #B07D4F; }
+.search-bar button { padding: 8px 14px; border-radius: 20px; border: none; background: #B07D4F; color: #fff; font-size: 12px; cursor: pointer; font-weight: 600; }
 .filters { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px; }
-.filter-chip { padding: 4px 10px; border-radius: 16px; font-size: 10px; white-space: nowrap; background: #e9ecef; border: 1px solid #dee2e6; color: #6c757d; }
-.filter-chip.active { background: #495057; border-color: #495057; color: #fff; }
-.listing-card { background: #fff; border-radius: 14px; overflow: hidden; margin-bottom: 10px; border: 1px solid #e9ecef; }
-.listing-img { height: 100px; background: linear-gradient(135deg, #495057, #6c757d); display: flex; align-items: center; justify-content: center; font-size: 28px; }
+.filter-chip { padding: 5px 12px; border-radius: 16px; font-size: 10px; white-space: nowrap; background: #fff; border: 1px solid #e0e0e0; color: #666; }
+.filter-chip.active { background: #B07D4F; border-color: #B07D4F; color: #fff; }
+.listing-card { background: #fff; border-radius: 16px; overflow: hidden; margin-bottom: 10px; border: 1px solid #f0f0f0; }
+.listing-img { height: 110px; background: linear-gradient(135deg, #B07D4F, #D4A574); display: flex; align-items: center; justify-content: center; font-size: 28px; position: relative; }
+.listing-img .heart { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 .listing-info { padding: 10px; }
-.listing-info .type { font-size: 12px; font-weight: 700; color: #212529; }
-.listing-info .rent { font-size: 13px; font-weight: 700; color: #495057; margin-top: 2px; }
-.listing-info .distance { font-size: 10px; color: #6c757d; margin-top: 2px; }
+.listing-info .type { font-size: 12px; font-weight: 700; color: #1a1a1a; }
+.listing-info .rent { font-size: 14px; font-weight: 700; color: #B07D4F; margin-top: 2px; }
+.listing-info .distance { font-size: 10px; color: #888; margin-top: 2px; }
 .listing-info .details { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
-.listing-info .detail-tag { font-size: 9px; padding: 2px 7px; border-radius: 6px; background: #e9ecef; color: #495057; }
+.listing-info .detail-tag { font-size: 9px; padding: 2px 7px; border-radius: 6px; background: #f5f5f5; color: #666; }
 .listing-info .verified { display: flex; align-items: center; gap: 3px; margin-top: 6px; font-size: 9px; color: #28a745; font-weight: 600; }
-.btn { display: block; width: 100%; padding: 10px; border-radius: 10px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
-.btn-primary { background: #495057; color: #fff; }
-.btn-outline { background: #fff; border: 1.5px solid #495057; color: #495057; margin-top: 6px; }
-.detail-img { height: 160px; background: linear-gradient(135deg, #495057, #6c757d); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.btn { display: block; width: 100%; padding: 10px; border-radius: 12px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
+.btn-primary { background: #B07D4F; color: #fff; }
+.btn-outline { background: #fff; border: 1.5px solid #B07D4F; color: #B07D4F; margin-top: 6px; }
+.detail-img { height: 150px; background: linear-gradient(135deg, #B07D4F, #D4A574); display: flex; align-items: center; justify-content: center; font-size: 40px; position: relative; }
+.detail-img .back { position: absolute; top: 10px; left: 10px; width: 32px; height: 32px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+.detail-img .heart { position: absolute; top: 10px; right: 10px; width: 32px; height: 32px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; }
 .detail-body { padding: 14px; }
-.detail-title { font-size: 15px; font-weight: 700; color: #212529; }
-.detail-rent { font-size: 18px; font-weight: 700; color: #495057; margin-bottom: 6px; }
-.detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f3f5; font-size: 11px; }
-.detail-row .label { color: #6c757d; }
-.detail-row .value { color: #212529; font-weight: 500; }
-.section-title { font-size: 10px; font-weight: 700; color: #6c757d; text-transform: uppercase; margin: 12px 0 6px; letter-spacing: 0.5px; }
+.detail-title { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+.detail-rent { font-size: 18px; font-weight: 700; color: #B07D4F; margin-bottom: 6px; }
+.detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f5f5f5; font-size: 11px; }
+.detail-row .label { color: #888; }
+.detail-row .value { color: #1a1a1a; font-weight: 500; }
+.section-title { font-size: 10px; font-weight: 700; color: #888; text-transform: uppercase; margin: 12px 0 6px; letter-spacing: 0.5px; }
 .tag { display: inline-block; padding: 3px 8px; border-radius: 16px; font-size: 9px; margin-right: 4px; margin-bottom: 3px; }
 .tag-green { background: #d4edda; color: #28a745; }
-.tag-blue { background: #e9ecef; color: #495057; }
+.tag-brown { background: #f5e6d3; color: #B07D4F; }
 .otp-inputs { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
-.otp-box { width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid #dee2e6; background: #fff; color: #212529; text-align: center; font-size: 18px; font-weight: 700; }
+.otp-box { width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid #e0e0e0; background: #fff; color: #1a1a1a; text-align: center; font-size: 18px; font-weight: 700; }
 .code-display { text-align: center; padding: 30px 16px; }
-.code-display .code { font-size: 40px; font-weight: 700; letter-spacing: 10px; color: #495057; margin: 16px 0; }
-.code-display .label { font-size: 12px; color: #6c757d; }
+.code-display .code { font-size: 40px; font-weight: 700; letter-spacing: 10px; color: #B07D4F; margin: 16px 0; }
+.code-display .label { font-size: 12px; color: #888; }
 .stars { color: #ffc107; font-size: 14px; letter-spacing: 3px; }
-.review-card { background: #f8f9fa; border-radius: 10px; padding: 10px; margin-bottom: 6px; border: 1px solid #e9ecef; }
+.review-card { background: #f9f9f9; border-radius: 10px; padding: 10px; margin-bottom: 6px; border: 1px solid #f0f0f0; }
 .review-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.review-card .name { font-size: 11px; font-weight: 600; color: #212529; }
-.review-card .comment { font-size: 10px; color: #6c757d; line-height: 1.3; }
+.review-card .name { font-size: 11px; font-weight: 600; color: #1a1a1a; }
+.review-card .comment { font-size: 10px; color: #666; line-height: 1.3; }
 .compare-table { width: 100%; border-collapse: collapse; font-size: 10px; }
-.compare-table th { text-align: left; padding: 6px; color: #6c757d; border-bottom: 2px solid #495057; }
-.compare-table td { padding: 6px; border-bottom: 1px solid #f1f3f5; text-align: center; }
-.compare-table td:first-child { text-align: left; color: #6c757d; }
+.compare-table th { text-align: left; padding: 6px; color: #888; border-bottom: 2px solid #B07D4F; }
+.compare-table td { padding: 6px; border-bottom: 1px solid #f5f5f5; text-align: center; }
+.compare-table td:first-child { text-align: left; color: #888; }
+.bottom-nav { position: absolute; bottom: 0; left: 0; right: 0; background: #fff; display: flex; justify-content: space-around; padding: 8px 0; border-top: 1px solid #f0f0f0; }
+.bottom-nav .nav-item { text-align: center; font-size: 9px; color: #888; }
+.bottom-nav .nav-item.active { color: #B07D4F; }
+.bottom-nav .nav-icon { font-size: 16px; display: block; margin-bottom: 2px; }
 .hidden { display: none; }
 </style>
 </head>
 <body>
 <div class="header">
   <h1>Quick-Broker</h1>
-  <p>Working Preview — Click tabs to navigate</p>
+  <p>Working Preview — Muzli-Inspired Design</p>
 </div>
 <div class="tabs">
   <button class="active" onclick="show(0)">Landing</button>
@@ -90,19 +98,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
       <div class="app-bar"><div class="logo">QB</div><span class="title">Quick-Broker</span><span class="menu">⋯</span></div>
       <div class="content">
-        <div class="search-bar"><input placeholder="Search area..."><button>Search</button></div>
+        <div class="search-bar"><input placeholder="Search area, house type..."><button>Search</button></div>
         <div class="filters"><span class="filter-chip active">All</span><span class="filter-chip">Single</span><span class="filter-chip">Double</span><span class="filter-chip">Self-Cont.</span></div>
-        <div class="listing-card"><div class="listing-img">🏠</div><div class="listing-info"><div class="type">Double Room</div><div class="rent">UGX 280,000/month</div><div class="distance">1.2 km from KIU · ~8 min boda</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Shared Bath</span></div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏡</div><div class="listing-info"><div class="type">Self-Contained Single</div><div class="rent">UGX 350,000/month</div><div class="distance">800 m from KIU · ~5 min boda</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Private Bath</span></div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏢</div><div class="listing-info"><div class="type">Single Room</div><div class="rent">UGX 180,000/month</div><div class="distance">2.5 km from KIU · ~15 min boda</div><div class="details"><span class="detail-tag">No Kitchen</span></div><div class="verified">✓ Identity Verified</div></div></div>
+        <div class="listing-card"><div class="listing-img">🏠<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Double Room</div><div class="rent">UGX 280,000/month</div><div class="distance">1.2 km from KIU · ~8 min boda</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Shared Bath</span></div><div class="verified">✓ Identity Verified</div></div></div>
+        <div class="listing-card"><div class="listing-img">🏡<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Self-Contained Single</div><div class="rent">UGX 350,000/month</div><div class="distance">800 m from KIU · ~5 min boda</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Private Bath</span></div><div class="verified">✓ Identity Verified</div></div></div>
+        <div class="listing-card"><div class="listing-img">🏢<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Single Room</div><div class="rent">UGX 180,000/month</div><div class="distance">2.5 km from KIU · ~15 min boda</div><div class="details"><span class="detail-tag">No Kitchen</span></div><div class="verified">✓ Identity Verified</div></div></div>
       </div>
+      <div class="bottom-nav"><div class="nav-item active"><span class="nav-icon">🏠</span>Home</div><div class="nav-item"><span class="nav-icon">🔍</span>Search</div><div class="nav-item"><span class="nav-icon">🔔</span>Alerts</div><div class="nav-item"><span class="nav-icon">👤</span>Profile</div></div>
     </div>
 
     <!-- Screen 2: Detail -->
     <div id="screen-1" class="hidden">
       <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">Listing Details</span><span class="menu">❤️ ↗️</span></div>
-      <div class="detail-img">🏠</div>
+      <div class="app-bar"><div class="logo">QB</div><span class="title">Listing Details</span><span class="menu">⋯</span></div>
+      <div class="detail-img">🏠<div class="back">←</div><div class="heart">❤️</div></div>
       <div class="detail-body">
         <div class="detail-title">Double Room — Kakoba</div>
         <div class="detail-rent">UGX 280,000/month</div>
@@ -117,7 +126,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
         <div class="detail-row"><span class="label">Electricity</span><span class="value">Shared bill</span></div>
         <div class="detail-row"><span class="label">Water</span><span class="value">Community tap</span></div>
         <div class="section-title">Status</div>
-        <div><span class="tag tag-green">✓ Available</span><span class="tag tag-blue">✓ Verified Landlord</span></div>
+        <div><span class="tag tag-green">✓ Available</span><span class="tag tag-brown">✓ Verified Landlord</span></div>
         <div style="margin-top:12px;"><button class="btn btn-primary">📅 Request Inspection</button><button class="btn btn-outline">📞 Call Landlord</button><button class="btn btn-outline">💬 WhatsApp</button></div>
       </div>
     </div>
@@ -128,11 +137,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="app-bar"><div class="logo">QB</div><span class="title">Quick-Broker</span><span class="menu"></span></div>
       <div class="content" style="padding:30px 20px;text-align:center;">
         <div style="font-size:40px;margin:30px 0 12px;">🏠</div>
-        <h2 style="font-size:18px;color:#212529;">Welcome Back</h2>
-        <p style="font-size:12px;color:#6c757d;margin:6px 0 24px;">Enter your email to receive a login code</p>
-        <input placeholder="your@email.com" style="width:100%;padding:12px 14px;border-radius:10px;border:1.5px solid #dee2e6;background:#fff;color:#212529;font-size:12px;margin-bottom:12px;">
+        <h2 style="font-size:18px;color:#1a1a1a;">Welcome Back</h2>
+        <p style="font-size:12px;color:#888;margin:6px 0 24px;">Enter your email to receive a login code</p>
+        <input placeholder="your@email.com" style="width:100%;padding:12px 14px;border-radius:20px;border:1.5px solid #e0e0e0;background:#fff;color:#1a1a1a;font-size:12px;margin-bottom:12px;">
         <button class="btn btn-primary">Send Login Code</button>
-        <p style="font-size:10px;color:#adb5bd;margin-top:12px;">We'll email you a 6-digit code to verify your account.</p>
+        <p style="font-size:10px;color:#aaa;margin-top:12px;">We'll email you a 6-digit code to verify your account.</p>
       </div>
     </div>
 
@@ -142,11 +151,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="app-bar"><div class="logo">QB</div><span class="title">Verify Email</span><span class="menu"></span></div>
       <div class="content" style="padding:30px 20px;text-align:center;">
         <div style="font-size:30px;margin:20px 0 10px;">📧</div>
-        <h2 style="font-size:16px;color:#212529;">Check Your Email</h2>
-        <p style="font-size:11px;color:#6c757d;margin:6px 0 20px;">Enter the 6-digit code sent to your@email.com</p>
+        <h2 style="font-size:16px;color:#1a1a1a;">Check Your Email</h2>
+        <p style="font-size:11px;color:#888;margin:6px 0 20px;">Enter the 6-digit code sent to your@email.com</p>
         <div class="otp-inputs"><input class="otp-box" value="4"><input class="otp-box" value="8"><input class="otp-box" value="3"><input class="otp-box" value="9"><input class="otp-box" value="2"><input class="otp-box" value="0"></div>
         <button class="btn btn-primary">Verify & Login</button>
-        <p style="font-size:11px;color:#6c757d;margin-top:12px;">Didn't receive it? <span style="color:#495057;font-weight:600;">Resend code</span></p>
+        <p style="font-size:11px;color:#888;margin-top:12px;">Didn't receive it? <span style="color:#B07D4F;font-weight:600;">Resend code</span></p>
       </div>
     </div>
 
@@ -159,7 +168,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
         <div class="code">483920</div>
         <div class="label">Expires in 23:45:12</div>
         <div style="margin-top:20px;">
-          <div class="review-card" style="text-align:left;"><div class="name">Double Room — Kakoba</div><div style="font-size:10px;color:#6c757d;margin-top:3px;">Tomorrow, 10:00 AM · 1.2 km from KIU</div></div>
+          <div class="review-card" style="text-align:left;"><div class="name">Double Room — Kakoba</div><div style="font-size:10px;color:#888;margin-top:3px;">Tomorrow, 10:00 AM · 1.2 km from KIU</div></div>
           <button class="btn btn-primary" style="margin-top:12px;">📞 Call Landlord</button>
         </div>
       </div>
@@ -171,8 +180,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="app-bar"><div class="logo">QB</div><span class="title">Reviews</span><span class="menu"></span></div>
       <div class="detail-body">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div><div style="font-size:14px;font-weight:700;color:#212529;">Double Room — Kakoba</div><div class="stars">★★★★★</div></div>
-          <div style="margin-left:auto;text-align:right;"><div style="font-size:20px;font-weight:700;color:#495057;">4.6</div><div style="font-size:10px;color:#6c757d;">12 reviews</div></div>
+          <div><div style="font-size:14px;font-weight:700;color:#1a1a1a;">Double Room — Kakoba</div><div class="stars">★★★★★</div></div>
+          <div style="margin-left:auto;text-align:right;"><div style="font-size:20px;font-weight:700;color:#B07D4F;">4.6</div><div style="font-size:10px;color:#888;">12 reviews</div></div>
         </div>
         <div class="section-title">Rating Breakdown</div>
         <div class="detail-row"><span class="label">Accuracy</span><span class="value">★★★★☆</span></div>
@@ -194,7 +203,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="content" style="overflow-x:auto;">
         <table class="compare-table">
           <tr><th>Feature</th><th>🏠 A</th><th>🏡 B</th></tr>
-          <tr><td>Rent</td><td style="color:#495057;font-weight:700;">280k</td><td style="color:#495057;font-weight:700;">350k</td></tr>
+          <tr><td>Rent</td><td style="color:#B07D4F;font-weight:700;">280k</td><td style="color:#B07D4F;font-weight:700;">350k</td></tr>
           <tr><td>Distance</td><td>1.2 km</td><td>800 m</td></tr>
           <tr><td>Boda Time</td><td>8 min</td><td>5 min</td></tr>
           <tr><td>Type</td><td>Double</td><td>Self-Cont.</td></tr>
@@ -214,10 +223,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
       <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
       <div class="app-bar"><div class="logo">QB</div><span class="title">My Saved Houses</span><span class="menu"></span></div>
       <div class="content">
-        <div class="listing-card"><div class="listing-img">🏠</div><div class="listing-info"><div class="type">Double Room — Kakoba</div><div class="rent">UGX 280,000/month</div><div class="distance">1.2 km from KIU · ~8 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏡</div><div class="listing-info"><div class="type">Self-Contained Single</div><div class="rent">UGX 350,000/month</div><div class="distance">800 m from KIU · ~5 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏢</div><div class="listing-info"><div class="type">Single Room — Ishaka Town</div><div class="rent">UGX 180,000/month</div><div class="distance">2.5 km from KIU · ~15 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
+        <div class="listing-card"><div class="listing-img">🏠<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Double Room — Kakoba</div><div class="rent">UGX 280,000/month</div><div class="distance">1.2 km from KIU · ~8 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
+        <div class="listing-card"><div class="listing-img">🏡<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Self-Contained Single</div><div class="rent">UGX 350,000/month</div><div class="distance">800 m from KIU · ~5 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
+        <div class="listing-card"><div class="listing-img">🏢<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Single Room — Ishaka Town</div><div class="rent">UGX 180,000/month</div><div class="distance">2.5 km from KIU · ~15 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
       </div>
+      <div class="bottom-nav"><div class="nav-item"><span class="nav-icon">🏠</span>Home</div><div class="nav-item"><span class="nav-icon">🔍</span>Search</div><div class="nav-item"><span class="nav-icon">🔔</span>Alerts</div><div class="nav-item"><span class="nav-icon">👤</span>Profile</div></div>
     </div>
 
   </div>

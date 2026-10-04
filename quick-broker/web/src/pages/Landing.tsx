@@ -45,9 +45,9 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-accent pb-20">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary p-4">
-        <h1 className="text-white text-xl font-bold">Quick-Broker</h1>
-        <p className="text-white/80 text-xs">Find student housing in Ishaka</p>
+      <div className="bg-white p-4 border-b border-border">
+        <h1 className="text-text text-xl font-bold">Quick-Broker</h1>
+        <p className="text-muted text-xs">Find student housing in Ishaka</p>
       </div>
 
       {/* Search */}
@@ -55,14 +55,14 @@ export default function Landing() {
         <div className="flex gap-2 mb-3">
           <input
             type="text"
-            placeholder="Search area..."
+            placeholder="Search area, house type..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 px-3 py-2 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-primary"
+            className="flex-1 px-4 py-2 rounded-full border border-border bg-white text-sm focus:outline-none focus:border-primary"
           />
           <button
             onClick={fetchListings}
-            className="px-4 py-2 bg-primary text-white rounded-xl text-sm font-semibold"
+            className="px-5 py-2 bg-primary text-white rounded-full text-sm font-semibold"
           >
             Search
           </button>
@@ -74,7 +74,7 @@ export default function Landing() {
             <button
               key={type}
               onClick={() => setHouseType(type)}
-              className={`px-3 py-1.5 rounded-full text-xs whitespace-nowrap border ${
+              className={`px-4 py-1.5 rounded-full text-xs whitespace-nowrap border ${
                 houseType === type
                   ? 'bg-primary text-white border-primary'
                   : 'bg-white text-muted border-border'
