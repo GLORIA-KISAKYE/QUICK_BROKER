@@ -39,7 +39,7 @@ export default function Login() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-xl border border-border bg-white text-sm focus:outline-none focus:border-primary"
+            className="w-full px-4 py-3 rounded-full border border-border bg-white text-sm focus:outline-none focus:border-primary"
           />
 
           {error && <p className="text-danger text-sm">{error}</p>}
@@ -47,7 +47,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white rounded-xl font-semibold disabled:opacity-50"
+            className="w-full py-3 bg-primary text-white rounded-full font-semibold disabled:opacity-50"
           >
             {loading ? 'Sending...' : 'Send Login Code'}
           </button>

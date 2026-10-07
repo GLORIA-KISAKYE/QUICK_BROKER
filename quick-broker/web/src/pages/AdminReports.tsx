@@ -52,8 +52,8 @@ export default function AdminReports() {
 
   return (
     <div className="min-h-screen bg-accent">
-      <div className="bg-gradient-to-r from-primary to-secondary p-4">
-        <h1 className="text-white text-xl font-bold">Reports</h1>
+      <div className="bg-white p-4 border-b border-border">
+        <h1 className="text-text text-xl font-bold">Reports</h1>
       </div>
 
       <div className="p-4">

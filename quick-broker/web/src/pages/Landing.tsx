@@ -44,13 +44,11 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-accent pb-20">
-      {/* Header */}
       <div className="bg-white p-4 border-b border-border">
         <h1 className="text-text text-xl font-bold">Quick-Broker</h1>
         <p className="text-muted text-xs">Find student housing in Ishaka</p>
       </div>
 
-      {/* Search */}
       <div className="p-3">
         <div className="flex gap-2 mb-3">
           <input
@@ -68,7 +66,6 @@ export default function Landing() {
           </button>
         </div>
 
-        {/* Filters */}
         <div className="flex gap-2 overflow-x-auto pb-2">
           {['', 'SINGLE_ROOM', 'DOUBLE_ROOM', 'SELF_CONTAINED_SINGLE'].map((type) => (
             <button
@@ -86,7 +83,6 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Listings */}
       <div className="px-3">
         {loading ? (
           <div className="text-center py-8 text-muted">Loading...</div>

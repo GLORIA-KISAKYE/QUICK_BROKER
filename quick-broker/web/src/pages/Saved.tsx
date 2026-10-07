@@ -36,8 +36,8 @@ export default function Saved() {
 
   return (
     <div className="min-h-screen bg-accent pb-20">
-      <div className="bg-gradient-to-r from-primary to-secondary p-4">
-        <h1 className="text-white text-xl font-bold">My Saved Houses</h1>
+      <div className="bg-white p-4 border-b border-border">
+        <h1 className="text-text text-xl font-bold">My Saved Houses</h1>
       </div>
 
       <div className="p-3">

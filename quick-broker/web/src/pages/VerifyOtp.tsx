@@ -89,7 +89,7 @@ export default function VerifyOtp() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-primary text-white rounded-xl font-semibold disabled:opacity-50"
+            className="w-full py-3 bg-primary text-white rounded-full font-semibold disabled:opacity-50"
           >
             {loading ? 'Verifying...' : 'Verify & Login'}
           </button>

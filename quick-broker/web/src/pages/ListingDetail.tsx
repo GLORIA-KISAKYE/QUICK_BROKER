@@ -65,25 +65,21 @@ export default function ListingDetail() {
 
   return (
     <div className="min-h-screen bg-accent pb-20">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-secondary p-4">
-        <h1 className="text-white text-lg font-bold">{listing.title}</h1>
-        <p className="text-white/80 text-xs">{listing.area}</p>
+      <div className="bg-white p-4 border-b border-border">
+        <h1 className="text-text text-lg font-bold">{listing.title}</h1>
+        <p className="text-muted text-xs">{listing.area}</p>
       </div>
 
-      {/* Image */}
       <div className="h-48 bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-6xl">
         🏠
       </div>
 
       <div className="p-4 space-y-4">
-        {/* Rent */}
         <div className="bg-white rounded-2xl p-4 border border-border">
           <p className="text-primary text-2xl font-bold">UGX {listing.rent_amount.toLocaleString()}/month</p>
           <p className="text-muted text-sm mt-1">{listing.distance_from_kiu} km from KIU · ~{listing.transport_time_boda} min boda</p>
         </div>
 
-        {/* Details */}
         <div className="bg-white rounded-2xl p-4 border border-border">
           <h2 className="font-bold text-sm text-muted uppercase mb-3">Details</h2>
           <div className="space-y-2 text-sm">
@@ -97,13 +93,11 @@ export default function ListingDetail() {
           </div>
         </div>
 
-        {/* Status */}
         <div className="flex gap-2">
           <span className="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">✓ {listing.status}</span>
-          <span className="px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-700">✓ Verified</span>
+          <span className="px-3 py-1 rounded-full text-xs bg-orange-100 text-orange-700">✓ Verified Landlord</span>
         </div>
 
-        {/* Actions */}
         {user && (
           <div className="space-y-2">
             <button className="w-full py-3 bg-primary text-white rounded-xl font-semibold">

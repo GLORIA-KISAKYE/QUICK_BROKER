@@ -11,7 +11,6 @@ export default function BottomNav() {
     { path: '/saved', icon: '👤', label: 'Profile' },
   ];
 
-  // Don't show on auth or admin pages
   if (location.pathname.startsWith('/auth') || location.pathname.startsWith('/admin')) {
     return null;
   }

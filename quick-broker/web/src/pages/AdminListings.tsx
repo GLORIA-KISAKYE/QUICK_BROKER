@@ -70,11 +70,11 @@ export default function AdminListings() {
 
   return (
     <div className="min-h-screen bg-accent">
-      <div className="bg-gradient-to-r from-primary to-secondary p-4 flex justify-between items-center">
-        <h1 className="text-white text-xl font-bold">Manage Listings</h1>
+      <div className="bg-white p-4 border-b border-border flex justify-between items-center">
+        <h1 className="text-text text-xl font-bold">Manage Listings</h1>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="px-3 py-1 bg-white text-primary rounded-lg text-sm font-semibold"
+          className="px-3 py-1 bg-primary text-white rounded-lg text-sm font-semibold"
         >
           {showForm ? 'Cancel' : '+ New'}
         </button>

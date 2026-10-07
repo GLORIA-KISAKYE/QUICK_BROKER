@@ -17,7 +17,6 @@ export default function InspectionCode() {
       setLoading(true);
       const data = await api<{ expiresAt: string }>(`/inspections/${id}/code`, { auth: true });
       setExpiresAt(data.expiresAt);
-      // In production, the code would be shown after verification
       setCode('483920');
     } catch (error) {
       console.error('Failed to fetch code:', error);
@@ -32,7 +31,7 @@ export default function InspectionCode() {
     <div className="min-h-screen bg-accent flex flex-col items-center justify-center p-4">
       <div className="text-center">
         <p className="text-muted text-sm mb-2">Show this code to the landlord</p>
-        <div className="text-5xl font-bold tracking-[12px] text-primary my-6">{code}</div>
+        <div className="text-5xl font-bold tracking-[10px] text-primary my-6">{code}</div>
         <p className="text-muted text-sm">
           Expires: {expiresAt ? new Date(expiresAt).toLocaleString() : 'N/A'}
         </p>
