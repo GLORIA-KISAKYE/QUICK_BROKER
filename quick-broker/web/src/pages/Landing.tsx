@@ -21,16 +21,23 @@ export default function Landing() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [houseType, setHouseType] = useState('');
+  const [view, setView] = useState<'welcome' | 'browse'>('welcome');
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
     if (user?.role === 'LANDLORD') {
       navigate('/landlord');
-      return;
+    } else if (user?.role === 'STUDENT') {
+      setView('browse');
     }
-    fetchListings();
-  }, [search, houseType, user, navigate]);
+  }, [user, navigate]);
+
+  useEffect(() => {
+    if (view === 'browse') {
+      fetchListings();
+    }
+  }, [search, houseType, view]);
 
   const fetchListings = async () => {
     try {
@@ -48,79 +55,60 @@ export default function Landing() {
     }
   };
 
-  // Role selection screen (shown by default when not logged in)
-  if (!user) {
+  // Welcome screen — first thing users see
+  if (view === 'welcome' && !user) {
     return (
-      <div className="min-h-screen bg-accent flex flex-col">
-        {/* Hero Section */}
-        <div className="bg-gradient-to-br from-primary to-secondary p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
+        <div className="w-full max-w-sm text-center">
           <div className="text-6xl mb-4">🏠</div>
-          <h1 className="text-3xl font-bold text-white">Quick-Broker</h1>
-          <p className="text-white/80 mt-2">Find the right student house without walking around Ishaka</p>
-        </div>
+          <h1 className="text-3xl font-bold text-white mb-2">Quick-Broker</h1>
+          <p className="text-white/80 text-sm mb-8">Find the right student house without walking around Ishaka</p>
 
-        {/* Role Selection */}
-        <div className="flex-1 flex items-center justify-center p-6">
-          <div className="w-full max-w-sm">
-            <h2 className="text-xl font-bold text-text text-center mb-6">How do you want to use Quick-Broker?</h2>
+          <div className="space-y-3">
+            <button
+              onClick={() => navigate('/auth/register?role=STUDENT')}
+              className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg hover:shadow-xl transition-shadow"
+            >
+              <div className="text-lg">🎓 I'm a Student</div>
+              <div className="text-sm opacity-70 mt-1">Find housing near KIU</div>
+            </button>
 
-            <div className="space-y-4">
-              <button
-                onClick={() => navigate('/auth/register?role=STUDENT')}
-                className="w-full py-5 bg-primary text-white rounded-2xl font-semibold text-left px-6 shadow-lg hover:shadow-xl transition-shadow"
-              >
-                <div className="text-xl">🎓 I'm a Student</div>
-                <div className="text-sm opacity-80 mt-1">Find housing near KIU</div>
-              </button>
-
-              <button
-                onClick={() => navigate('/auth/register?role=LANDLORD')}
-                className="w-full py-5 bg-white border-2 border-primary text-primary rounded-2xl font-semibold text-left px-6 hover:bg-accent transition-colors"
-              >
-                <div className="text-xl">🏠 I'm a Landlord</div>
-                <div className="text-sm opacity-80 mt-1">List my properties</div>
-              </button>
-            </div>
-
-            <p className="text-center text-muted text-sm mt-6">
-              Already have an account?{' '}
-              <button onClick={() => navigate('/auth/login')} className="text-primary font-semibold">
-                Login
-              </button>
-            </p>
+            <button
+              onClick={() => navigate('/auth/register?role=LANDLORD')}
+              className="w-full py-4 bg-white/20 text-white border-2 border-white rounded-2xl font-semibold text-left px-5 hover:bg-white/30 transition-colors"
+            >
+              <div className="text-lg">🏠 I'm a Landlord</div>
+              <div className="text-sm opacity-80 mt-1">List my properties</div>
+            </button>
           </div>
-        </div>
 
-        {/* Preview Section */}
-        <div className="p-4 border-t border-border bg-white">
-          <p className="text-muted text-xs text-center mb-3">Available listings</p>
-          <div className="space-y-2">
-            {loading ? (
-              <div className="skeleton h-20 rounded-xl"></div>
-            ) : (
-              listings.slice(0, 2).map((listing) => (
-                <div key={listing.id} className="bg-accent rounded-xl p-3 flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center text-xl">🏠</div>
-                  <div className="flex-1">
-                    <p className="font-semibold text-sm text-text">{listing.house_type.replace(/_/g, ' ')}</p>
-                    <p className="text-muted text-xs">{listing.area}</p>
-                  </div>
-                  <p className="text-primary font-bold text-sm">UGX {listing.rent_amount.toLocaleString()}</p>
-                </div>
-              ))
-            )}
-          </div>
+          <button
+            onClick={() => setView('browse')}
+            className="mt-6 text-white/80 text-sm underline"
+          >
+            Browse listings without an account →
+          </button>
         </div>
       </div>
     );
   }
 
-  // Student view (logged in)
+  // Student browse view
   return (
     <div className="min-h-screen bg-accent pb-20">
       <div className="bg-white p-4 border-b border-border">
-        <h1 className="text-text text-xl font-bold">Quick-Broker</h1>
-        <p className="text-muted text-xs">Find student housing in Ishaka</p>
+        <div className="flex justify-between items-center">
+          <div>
+            <h1 className="text-text text-xl font-bold">Quick-Broker</h1>
+            <p className="text-muted text-xs">Find student housing in Ishaka</p>
+          </div>
+          <button
+            onClick={() => setView('welcome')}
+            className="px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold"
+          >
+            Sign Up
+          </button>
+        </div>
       </div>
 
       <div className="p-3">

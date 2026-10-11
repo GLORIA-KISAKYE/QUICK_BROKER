@@ -13,6 +13,7 @@ export default function VerifyOtp() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const email = (location.state as { email?: string })?.email || '';
+  const role = (location.state as { role?: string })?.role || 'STUDENT';
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -48,7 +49,12 @@ export default function VerifyOtp() {
         { method: 'POST', body: { email, code: otp } }
       );
       login(data.accessToken, data.user);
-      navigate('/');
+      // Redirect based on role
+      if (data.user.role === 'LANDLORD') {
+        navigate('/landlord');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid code');
     } finally {
