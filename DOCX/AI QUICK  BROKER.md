@@ -1479,9 +1479,10 @@ This section documents all architectural and design decisions made during implem
 
 | Decision | Original PRD | Implemented | Reason |
 |----------|-------------|-------------|--------|
-| **Landlord accounts** | Both students and landlords register | Students only — landlords are NOT users in v1 | Reduces complexity for MVP. Landlords are managed by admin; students contact landlords directly via phone/WhatsApp. This removes the need for landlord authentication, verification flows, and landlord dashboards. |
-| **Auth method** | Phone OTP (implied) | Email OTP (ZeptoMail) | Email OTP is free — no SMS costs (~$1–4/month saved). ZeptoMail sandbox mode requires no domain verification, keeping costs at $0/month. Trade-off: some students may not check email regularly; WhatsApp OTP can be added in v1.1. |
-| **User roles** | Student, Landlord | Student, Admin | Admin manages all listings on behalf of landlords. No landlord role needed in v1. |
+| **Landlord accounts** | Both students and landlords register | **All three roles: Student, Landlord, Admin** | Landlords self-manage listings; Admin oversees platform |
+| **Auth method** | Phone OTP (implied) | **Magic Link (ZeptoMail)** | No passwords needed — users click link in email to login. Most secure and user-friendly. |
+| **User roles** | Student, Landlord | **Student, Landlord, Admin** | Three distinct role-based interfaces |
+| **Landlord verification** | National ID + phone | **National ID + phone + admin approval** | Landlords submit documents; admin approves before they can list |
 
 ---
 
@@ -1489,12 +1490,14 @@ This section documents all architectural and design decisions made during implem
 
 | Decision | Original PRD | Implemented | Reason |
 |----------|-------------|-------------|--------|
-| **Backend framework** | Not specified | Node.js + Express | Same language as frontend (React) — one developer can build everything. Lightweight, fast to build, direct PostgreSQL queries. |
-| **Database** | Not specified | PostgreSQL (self-hosted on local device) | Full control, no vendor lock-in. Raw SQL queries. |
-| **ORM** | Not specified | **None** — raw SQL with `pg` (node-postgres) | User requirement. No abstraction layer — full control over queries, no ORM learning curve, no dependency bloat. |
-| **API style** | Not specified | REST (JSON) | Simple, well-understood, easy to test. Auto-generated from route definitions. |
-| **Authentication** | Not specified | JWT (access + refresh tokens) | Stateless, scalable, standard. Access token (15 min) + refresh token (7 days). Stored in httpOnly cookies for security. |
-| **Auth flow (updated)** | Email OTP for all logins | **Email OTP for new users only; existing users get instant access** | User requirement (Oct 2026). Returning users enter their email and are logged in immediately — no OTP, no password. New users verify with OTP during registration only. |
+| **Backend framework** | Not specified | Node.js + Express | Same language as frontend (React) — one developer can build everything |
+| **Database** | Not specified | PostgreSQL (self-hosted on local device) | Full control, no vendor lock-in, raw SQL queries |
+| **ORM** | Not specified | **None** — raw SQL with `pg` (node-postgres) | User requirement. Full control over queries |
+| **API style** | Not specified | REST (JSON) | Simple, well-understood, easy to test |
+| **Authentication** | Not specified | **Magic Link + JWT** | No passwords; magic link sent to email; JWT for session management |
+| **Auth flow** | Email OTP for all logins | **Magic Link for all users** | New users: click link → provide name + role → logged in. Returning users: click link → logged in instantly |
+| **Distance calculation** | Not specified | **OSRM routing API** | Accurate road distances (not straight-line Haversine) |
+| **Transport info** | Auto-calculated boda time | **Manual entry by landlord** | Landlords know their area best; enter transport details manually |
 
 ---
 
@@ -1502,13 +1505,13 @@ This section documents all architectural and design decisions made during implem
 
 | Decision | Original PRD | Implemented | Reason |
 |----------|-------------|-------------|--------|
-| **Image storage** | Not specified | Cloudflare R2 (S3-compatible) | User requirement. Free tier: 10GB storage, 10M requests/month. Zero egress fees — critical for a local server with limited bandwidth. Images delivered via Cloudflare CDN for fast access in Uganda. |
-| **Hosting** | Not specified | Local device (Raspberry Pi / old laptop) | User requirement. Zero monthly cost. Full control. Low latency for Ishaka users. No vendor lock-in. |
-| **Domain** | Not specified | DuckDNS (free subdomain) | Free dynamic DNS for changing home IP addresses. No custom domain cost (~$12/year saved). |
-| **SSL** | Not specified | Let's Encrypt + certbot | Free HTTPS certificates with auto-renewal. No SSL cost. |
-| **Dev environment** | Not specified | Docker Compose | One-command local development (`docker-compose up`). Same environment everywhere. Easy backup/reset. No version conflicts. |
-| **Production process** | Not specified | PM2 | Auto-restart on crash/reboot. Simple process management. Zero cost. |
-| **Cron jobs** | Not specified | node-cron | Periodic availability confirmation emails. Runs in-process, no external service needed. |
+| **Image storage** | Not specified | Cloudflare R2 (S3-compatible) | Free tier: 10GB storage, zero egress fees, CDN delivery |
+| **Hosting** | Not specified | Local device (Raspberry Pi / old laptop) | Zero monthly cost, full control, low latency |
+| **Domain** | Not specified | DuckDNS (free subdomain) | Free dynamic DNS for changing home IP |
+| **SSL** | Not specified | Let's Encrypt + certbot | Free HTTPS certificates with auto-renewal |
+| **Dev environment** | Not specified | Docker Compose | One-command local development |
+| **Production process** | Not specified | PM2 | Auto-restart on crash/reboot |
+| **Cron jobs** | Not specified | node-cron | Periodic availability confirmation emails |
 
 ---
 
@@ -1516,11 +1519,13 @@ This section documents all architectural and design decisions made during implem
 
 | Decision | Original PRD | Implemented | Reason |
 |----------|-------------|-------------|--------|
-| **Framework** | Not specified | React 18 + Vite + Tailwind CSS | Fast development, mobile-first responsive, PWA-capable. |
-| **Mobile** | Not specified | PWA (Progressive Web App) | No app store friction. Works on any phone browser. Installable on Android/iOS. Zero app store fees. |
-| **Navigation** | Not specified | Bottom tab bar (Home, Saved, Compare, Inspections) | Mobile-first thumb-friendly navigation. |
-| **State management** | Not specified | React Context | Simple, no external dependency. Sufficient for auth state. |
-| **Styling** | Not specified | Tailwind CSS | Rapid development, consistent design system, small bundle. |
+| **Framework** | Not specified | React 18 + Vite + Tailwind CSS | Fast development, mobile-first responsive, PWA-capable |
+| **Mobile** | Not specified | PWA (Progressive Web App) | No app store friction, installable on Android/iOS |
+| **Navigation** | Not specified | Bottom tab bar (Home, Search, Alerts, Profile) | Mobile-first thumb-friendly navigation |
+| **State management** | Not specified | React Context | Simple, no external dependency |
+| **Styling** | Not specified | Tailwind CSS + custom SVG icons | Rapid development, consistent design system |
+| **Icons** | Emoji | **SVG house icon with roof, door, windows** | More realistic and professional appearance |
+| **Landing page** | Not specified | **Welcome screen with role selection** | First thing users see; clear Student/Landlord/Admin paths |
 
 ---
 
@@ -1528,7 +1533,7 @@ This section documents all architectural and design decisions made during implem
 
 | Item | Before | After | Savings |
 |------|--------|-------|---------|
-| SMS (Phone OTP) | ~$1–4/month | $0 | Email OTP is free |
+| SMS (Phone OTP) | ~$1–4/month | $0 | Magic link is free |
 | Cloud hosting | ~$25–50/month | $0 | Local device hosting |
 | Domain | ~$12/year | $0 | DuckDNS free subdomain |
 | SSL certificate | ~$50–100/year | $0 | Let's Encrypt free |
@@ -1541,40 +1546,47 @@ This section documents all architectural and design decisions made during implem
 
 | Trade-off | Impact | Mitigation |
 |-----------|--------|------------|
-| No landlord accounts | Less self-service for landlords | Admin manages listings; landlords can call/WhatsApp to update |
-| Email OTP (no SMS) | Some students may not check email | Add WhatsApp OTP in v1.1 (free, requires WhatsApp Business API approval) |
-| Local hosting | Requires reliable internet + power | UPS for power backup; PM2 auto-restart; UptimeRobot alerts |
-| No ORM | More manual SQL code | Full control; `pg` library is mature and stable |
+| Magic link requires email | Users without email can't login | Add phone OTP fallback in v1.1 |
+| Local hosting | Requires reliable internet + power | UPS for power backup; PM2 auto-restart |
+| No ORM | More manual SQL code | Full control; `pg` library is mature |
 | Home IP changes | DNS may be temporarily stale | DuckDNS auto-update client |
+| OSRM dependency | Requires internet for distance calc | Fallback to manual distance entry |
 
 ---
 
-### 27.7 Future Improvements
+### 27.7 User Roles & Interfaces
+
+| Role | Interface | Access |
+|------|-----------|--------|
+| **Student** | Browse listings, search, save, compare, request inspections, contact landlords | `/` (browse) |
+| **Landlord** | Manage own listings, accept/decline/verify inspections, submit identity verification | `/landlord` (dashboard) |
+| **Admin** | Manage all listings, verify landlords, review reports, suspend listings | `/admin` (dashboard) |
+
+### 27.8 Future Improvements
 
 | Priority | Feature | Notes |
 |----------|---------|-------|
-| v1.1 | WhatsApp OTP | Secondary login method; requires WhatsApp Business API approval |
-| v1.1 | Landlord accounts | Self-service listing management; requires auth flow |
+| v1.1 | Phone OTP fallback | For users without email access |
 | v1.2 | Real-time notifications | WebSocket for inspection status updates |
 | v1.2 | Featured listings | Paid promotional listings (monetization) |
 | v2.0 | Native mobile app | If PWA limitations become an issue |
 
 ---
 
-### 27.8 Implementation Files
+### 27.9 Implementation Files
 
 | File | Purpose |
 |------|---------|
-| `IMPLEMENTATION_PLAN.md` | Full implementation plan (this document's companion) |
+| `IMPLEMENTATION_PLAN.md` | Full implementation plan |
 | `design.html` | Static design preview (multi-screen) |
-| `quick-broker/preview.html` | Interactive single-page preview with tab navigation |
+| `quick-broker/preview.html` | Interactive preview with all 4 role interfaces |
 | `quick-broker/docker-compose.yml` | Docker Compose for local development |
 | `quick-broker/.env.example` | Environment variable template |
 | `quick-broker/server/` | Backend source code (Express + pg) |
-| `quick-broker/server/migrations/` | Database migration files (001–013) |
+| `quick-broker/server/migrations/` | Database migration files (001–020) |
 | `quick-broker/web/` | Frontend source code (React + Vite + Tailwind) |
 
 ---
 
-*End of PRD v1.1 — Implementation Notes*
+*End of PRD v1.2 — Implementation Notes*
 

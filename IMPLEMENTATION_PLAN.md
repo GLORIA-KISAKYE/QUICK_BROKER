@@ -1,8 +1,8 @@
 # Quick-Broker — Implementation Plan
 
-**Version:** 3.0
-**Date:** 2026-09-28
-**Source PRD:** `DOCX/AI QUICK BROKER.md` (v1.0)
+**Version:** 4.0
+**Date:** 2026-10-11
+**Source PRD:** `DOCX/AI QUICK BROKER.md` (v1.2)
 
 ---
 
@@ -12,8 +12,8 @@
 |---|---|
 | **Product** | Quick-Broker — rental discovery platform |
 | **Market** | Ishaka, Uganda (KIU students) |
-| **Users** | Students only — landlords are NOT users in v1; listings are admin-managed |
-| **Current Stage** | PRD complete; pre-development |
+| **Users** | Students, Landlords, Admins — three role-based interfaces |
+| **Current Stage** | Fully implemented (Phases 0–13) |
 | **Goal** | Connect KIU students with verified landlords; make finding accommodation faster, clearer, and more trustworthy |
 
 ---
@@ -26,13 +26,14 @@
 | **Mobile** | PWA (Progressive Web App) | **FREE** | No app store friction; works on any phone browser; installable |
 | **Backend** | Node.js + Express | **FREE** | Lightweight, fast to build, direct PostgreSQL queries |
 | **Database** | PostgreSQL (self-hosted on local device) | **FREE** | Full control, no vendor lock-in, raw SQL queries |
-| **Auth** | Email OTP (ZeptoMail + JWT) | **FREE** | ZeptoMail sandbox mode — no domain needed |
+| **Auth** | Magic Link (ZeptoMail + JWT) | **FREE** | No passwords needed — users click link in email to login |
 | **File Storage** | Cloudflare R2 (free tier: 10GB) | **FREE** | S3-compatible object storage, zero egress fees, CDN delivery |
 | **ORM** | **None** — raw SQL with `pg` library | **FREE** | Direct PostgreSQL queries via node-postgres |
 | **Hosting** | **Local device** (Raspberry Pi / old laptop / home PC) | **FREE** | Full control, zero monthly cost, low latency for Ishaka users |
 | **Dev Environment** | Docker Compose | **FREE** | One-command local development; same env everywhere |
 | **Process Manager** | PM2 | **FREE** | Production process management; auto-restart on crash |
-| **Maps/Distance** | OpenStreetMap + OSRM | **FREE** | Calculate distance/time from KIU |
+| **Maps/Distance** | OSRM Routing API | **FREE** | Accurate road distances (not straight-line) |
+| **Transport Info** | Manual entry by landlord | **FREE** | Landlords know their area best |
 | **WhatsApp** | WhatsApp Deep Links (`wa.me`) | **FREE** | Opens WhatsApp with pre-filled message |
 | **Calls** | `tel:` deep links | **FREE** | Native phone dialer |
 | **Domain** | DuckDNS | **FREE** | Free dynamic DNS subdomain |
@@ -45,9 +46,11 @@
 | React + Vite + Tailwind | **$0** |
 | Node.js + Express | **$0** |
 | PostgreSQL (local device) | **$0** |
-| Email OTP (ZeptoMail sandbox) | **$0** |
+| Magic Link auth (ZeptoMail) | **$0** |
 | Cloudflare R2 (free tier: 10GB storage, 10M requests/month) | **$0** |
 | Docker (local dev) | **$0** |
+| OSRM routing | **$0** |
+| **Total** | **$0/month** |
 | PM2 (production process manager) | **$0** |
 | Local device hosting | **$0/month** |
 | OpenStreetMap + OSRM | **$0** |
