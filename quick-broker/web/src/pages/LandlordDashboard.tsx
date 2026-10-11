@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 interface Stats {
   totalListings: number;
@@ -12,6 +13,7 @@ export default function LandlordDashboard() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchStats();
@@ -35,13 +37,14 @@ export default function LandlordDashboard() {
     <div className="min-h-screen bg-accent">
       <div className="bg-white p-4 border-b border-border">
         <h1 className="text-text text-xl font-bold">Landlord Dashboard</h1>
+        <p className="text-muted text-xs">Welcome, {user?.name}</p>
       </div>
 
       <div className="p-4">
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-white rounded-2xl p-4 border border-border">
             <p className="text-2xl font-bold text-primary">{stats?.totalListings || 0}</p>
-            <p className="text-muted text-xs mt-1">Listings</p>
+            <p className="text-muted text-xs mt-1">My Listings</p>
           </div>
           <div className="bg-white rounded-2xl p-4 border border-border">
             <p className="text-2xl font-bold text-primary">{stats?.totalInspections || 0}</p>

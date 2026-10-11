@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../utils/api';
 
 export default function Register() {
@@ -9,6 +9,14 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const roleParam = searchParams.get('role');
+    if (roleParam === 'LANDLORD' || roleParam === 'STUDENT') {
+      setRole(roleParam);
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,33 +37,16 @@ export default function Register() {
     <div className="min-h-screen bg-accent flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="text-5xl mb-4">🏠</div>
-          <h1 className="text-2xl font-bold text-text">Create Account</h1>
-          <p className="text-muted text-sm mt-1">Choose your account type</p>
+          <div className="text-5xl mb-4">{role === 'LANDLORD' ? '🏠' : '🎓'}</div>
+          <h1 className="text-2xl font-bold text-text">
+            {role === 'LANDLORD' ? 'Landlord Registration' : 'Student Registration'}
+          </h1>
+          <p className="text-muted text-sm mt-1">
+            {role === 'LANDLORD' ? 'List your properties on Quick-Broker' : 'Find housing near KIU'}
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setRole('STUDENT')}
-              className={`flex-1 py-3 rounded-xl border-2 text-sm font-semibold ${
-                role === 'STUDENT' ? 'bg-primary text-white border-primary' : 'bg-white text-muted border-border'
-              }`}
-            >
-              🎓 Student
-            </button>
-            <button
-              type="button"
-              onClick={() => setRole('LANDLORD')}
-              className={`flex-1 py-3 rounded-xl border-2 text-sm font-semibold ${
-                role === 'LANDLORD' ? 'bg-primary text-white border-primary' : 'bg-white text-muted border-border'
-              }`}
-            >
-              🏠 Landlord
-            </button>
-          </div>
-
           <input
             type="text"
             placeholder="Full name"

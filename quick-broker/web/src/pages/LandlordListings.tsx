@@ -84,7 +84,7 @@ export default function LandlordListings() {
           onClick={() => setShowForm(!showForm)}
           className="px-3 py-1 bg-primary text-white rounded-lg text-sm font-semibold"
         >
-          {showForm ? 'Cancel' : '+ New'}
+          {showForm ? 'Cancel' : '+ Add Listing'}
         </button>
       </div>
 
@@ -156,7 +156,7 @@ export default function LandlordListings() {
         {loading ? (
           <div className="text-center py-8 text-muted">Loading...</div>
         ) : listings.length === 0 ? (
-          <div className="text-center py-8 text-muted">No listings yet</div>
+          <div className="text-center py-8 text-muted">No listings yet. Add your first listing!</div>
         ) : (
           <div className="space-y-3">
             {listings.map((listing) => (
