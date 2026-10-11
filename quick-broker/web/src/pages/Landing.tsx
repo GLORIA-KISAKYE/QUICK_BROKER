@@ -26,14 +26,6 @@ export default function Landing() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (user?.role === 'LANDLORD') {
-      navigate('/landlord');
-    } else if (user?.role === 'STUDENT') {
-      setView('browse');
-    }
-  }, [user, navigate]);
-
-  useEffect(() => {
     if (view === 'browse') {
       fetchListings();
     }
@@ -55,8 +47,8 @@ export default function Landing() {
     }
   };
 
-  // Welcome screen — first thing users see
-  if (view === 'welcome' && !user) {
+  // Welcome screen — ALWAYS the first thing users see
+  if (view === 'welcome') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
         <div className="w-full max-w-sm text-center">
@@ -64,30 +56,63 @@ export default function Landing() {
           <h1 className="text-3xl font-bold text-white mb-2">Quick-Broker</h1>
           <p className="text-white/80 text-sm mb-8">Find the right student house without walking around Ishaka</p>
 
+          {/* Show logged-in user info */}
+          {user && (
+            <div className="mb-4 p-3 bg-white/20 rounded-xl">
+              <p className="text-white text-sm">Welcome back, <strong>{user.name}</strong></p>
+              <p className="text-white/70 text-xs capitalize">{user.role}</p>
+            </div>
+          )}
+
           <div className="space-y-3">
-            <button
-              onClick={() => navigate('/auth/register?role=STUDENT')}
-              className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg hover:shadow-xl transition-shadow"
-            >
-              <div className="text-lg">🎓 I'm a Student</div>
-              <div className="text-sm opacity-70 mt-1">Find housing near KIU</div>
-            </button>
+            {user ? (
+              <>
+                {/* Logged-in user — go directly to their interface */}
+                <button
+                  onClick={() => navigate(user.role === 'LANDLORD' ? '/landlord' : '/')}
+                  className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg"
+                >
+                  <div className="text-lg">
+                    {user.role === 'LANDLORD' ? '🏠 Go to Landlord Dashboard' : '🎓 Browse Listings'}
+                  </div>
+                  <div className="text-sm opacity-70 mt-1">Continue as {user.name}</div>
+                </button>
 
-            <button
-              onClick={() => navigate('/auth/register?role=LANDLORD')}
-              className="w-full py-4 bg-white/20 text-white border-2 border-white rounded-2xl font-semibold text-left px-5 hover:bg-white/30 transition-colors"
-            >
-              <div className="text-lg">🏠 I'm a Landlord</div>
-              <div className="text-sm opacity-80 mt-1">List my properties</div>
-            </button>
+                <button
+                  onClick={() => setView('browse')}
+                  className="w-full py-3 bg-white/20 text-white border-2 border-white rounded-2xl font-semibold text-sm"
+                >
+                  Browse as guest →
+                </button>
+              </>
+            ) : (
+              <>
+                {/* New user — choose role */}
+                <button
+                  onClick={() => navigate('/auth/register?role=STUDENT')}
+                  className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg hover:shadow-xl transition-shadow"
+                >
+                  <div className="text-lg">🎓 I'm a Student</div>
+                  <div className="text-sm opacity-70 mt-1">Find housing near KIU</div>
+                </button>
+
+                <button
+                  onClick={() => navigate('/auth/register?role=LANDLORD')}
+                  className="w-full py-4 bg-white/20 text-white border-2 border-white rounded-2xl font-semibold text-left px-5 hover:bg-white/30 transition-colors"
+                >
+                  <div className="text-lg">🏠 I'm a Landlord</div>
+                  <div className="text-sm opacity-80 mt-1">List my properties</div>
+                </button>
+
+                <button
+                  onClick={() => setView('browse')}
+                  className="mt-4 text-white/80 text-sm underline"
+                >
+                  Browse listings without an account →
+                </button>
+              </>
+            )}
           </div>
-
-          <button
-            onClick={() => setView('browse')}
-            className="mt-6 text-white/80 text-sm underline"
-          >
-            Browse listings without an account →
-          </button>
         </div>
       </div>
     );
@@ -106,7 +131,7 @@ export default function Landing() {
             onClick={() => setView('welcome')}
             className="px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold"
           >
-            Sign Up
+            Home
           </button>
         </div>
       </div>
