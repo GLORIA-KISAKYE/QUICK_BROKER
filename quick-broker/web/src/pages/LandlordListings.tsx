@@ -8,6 +8,7 @@ interface Listing {
   rent_amount: number;
   area: string;
   status: string;
+  transport_info: string;
   photos: string[];
 }
 
@@ -20,6 +21,7 @@ export default function LandlordListings() {
     house_type: 'SINGLE_ROOM',
     rent_amount: '',
     area: '',
+    transport_info: '',
     electricity: '',
     water: '',
     kitchen: '',
@@ -126,6 +128,13 @@ export default function LandlordListings() {
               className="w-full px-3 py-2 rounded-xl border border-border text-sm"
               required
             />
+            <input
+              type="text"
+              placeholder="Transport info (e.g., 10 min by boda, 25 min walk)"
+              value={form.transport_info}
+              onChange={(e) => setForm({ ...form, transport_info: e.target.value })}
+              className="w-full px-3 py-2 rounded-xl border border-border text-sm"
+            />
             <select
               value={form.electricity}
               onChange={(e) => setForm({ ...form, electricity: e.target.value })}
@@ -166,6 +175,9 @@ export default function LandlordListings() {
                     <h3 className="font-bold text-sm">{listing.title}</h3>
                     <p className="text-muted text-xs">{listing.area} · {listing.house_type.replace(/_/g, ' ')}</p>
                     <p className="text-primary font-bold text-sm">UGX {listing.rent_amount.toLocaleString()}/mo</p>
+                    {listing.transport_info && (
+                      <p className="text-muted text-xs">🚗 {listing.transport_info}</p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <select

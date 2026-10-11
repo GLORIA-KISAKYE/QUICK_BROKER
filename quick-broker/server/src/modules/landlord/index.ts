@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { query } from '../../db';
 import { authenticate, requireLandlord, AuthRequest } from '../../middleware/auth';
 import { uploadPhoto, deletePhoto } from '../../utils/storage';
-import { distanceFromKiu, bodaTime, walkTime } from '../../utils/distance';
+import { getRoadDistanceFromKiu } from '../../utils/distance';
 
 const router = Router();
 
@@ -19,6 +19,7 @@ const createListingSchema = z.object({
   toilet: z.enum(['PRIVATE', 'SHARED']).optional(),
   flooring: z.enum(['TILED', 'CEMENTED']).optional(),
   otherCharges: z.string().optional(),
+  transportInfo: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional()
 });
@@ -47,21 +48,20 @@ router.post('/listings', authenticate, requireLandlord, async (req: AuthRequest,
   try {
     const data = createListingSchema.parse(req.body);
 
-    let distance, boda, walk;
+    // Calculate road distance using OSRM if coordinates provided
+    let osrmDistance = null;
     if (data.latitude && data.longitude) {
-      distance = distanceFromKiu(data.latitude, data.longitude);
-      boda = bodaTime(distance);
-      walk = walkTime(distance);
+      osrmDistance = await getRoadDistanceFromKiu(data.latitude, data.longitude);
     }
 
     const result = await query(
-      `INSERT INTO listings (landlord_id, title, house_type, rent_amount, area, distance_from_kiu,
-        transport_time_boda, transport_time_walk, electricity, water, kitchen, bathroom, toilet,
+      `INSERT INTO listings (landlord_id, title, house_type, rent_amount, area, osrm_distance_km,
+        transport_info, electricity, water, kitchen, bathroom, toilet,
         flooring, other_charges, latitude, longitude)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *`,
       [req.user!.id, data.title, data.houseType, data.rentAmount, data.area,
-        distance || null, boda || null, walk || null,
+        osrmDistance, data.transportInfo || null,
         data.electricity || null, data.water || null, data.kitchen || null,
         data.bathroom || null, data.toilet || null, data.flooring || null,
         data.otherCharges || null, data.latitude || null, data.longitude || null]
@@ -80,7 +80,6 @@ router.post('/listings', authenticate, requireLandlord, async (req: AuthRequest,
 // Landlord: update listing
 router.patch('/listings/:id', authenticate, requireLandlord, async (req: AuthRequest, res) => {
   try {
-    // Verify ownership
     const existing = await query(
       'SELECT id FROM listings WHERE id = $1 AND landlord_id = $2',
       [req.params.id, req.user!.id]
@@ -89,7 +88,7 @@ router.patch('/listings/:id', authenticate, requireLandlord, async (req: AuthReq
       return res.status(404).json({ error: 'Listing not found' });
     }
 
-    const { title, rentAmount, area, status, ...other } = req.body;
+    const { title, rentAmount, area, status, transportInfo, ...other } = req.body;
     const updates: string[] = [];
     const params: unknown[] = [];
     let paramCount = 0;
@@ -98,6 +97,7 @@ router.patch('/listings/:id', authenticate, requireLandlord, async (req: AuthReq
     if (rentAmount) { params.push(rentAmount); updates.push(`rent_amount = $${++paramCount}`); }
     if (area) { params.push(area); updates.push(`area = $${++paramCount}`); }
     if (status) { params.push(status); updates.push(`status = $${++paramCount}`); }
+    if (transportInfo) { params.push(transportInfo); updates.push(`transport_info = $${++paramCount}`); }
 
     for (const [key, value] of Object.entries(other)) {
       if (value !== undefined) {
@@ -162,7 +162,6 @@ router.get('/inspections', authenticate, requireLandlord, async (req: AuthReques
 // Landlord: accept inspection
 router.patch('/inspections/:id/accept', authenticate, requireLandlord, async (req: AuthRequest, res) => {
   try {
-    // Verify ownership
     const inspection = await query(
       `SELECT i.id FROM inspections i
       JOIN listings l ON i.listing_id = l.id
@@ -197,7 +196,6 @@ router.patch('/inspections/:id/decline', authenticate, requireLandlord, async (r
       return res.status(404).json({ error: 'Inspection not found' });
     }
 
-    // Reset listing status
     await query("UPDATE listings SET status = 'AVAILABLE' WHERE id = $1", [result.rows[0].listing_id]);
 
     res.json({ data: result.rows[0] });
@@ -215,7 +213,6 @@ router.post('/inspections/:id/verify', authenticate, requireLandlord, async (req
       return res.status(400).json({ error: 'Code required' });
     }
 
-    // Verify ownership
     const inspection = await query(
       `SELECT i.id FROM inspections i
       JOIN listings l ON i.listing_id = l.id
@@ -244,7 +241,6 @@ router.post('/verify-identity', authenticate, requireLandlord, async (req: AuthR
   try {
     const { nationalId, phone } = verifyIdentitySchema.parse(req.body);
 
-    // Check if already verified
     const existing = await query(
       'SELECT status FROM landlord_verifications WHERE landlord_id = $1 ORDER BY created_at DESC LIMIT 1',
       [req.user!.id]
@@ -316,7 +312,6 @@ router.post('/listings/:id/photos', authenticate, requireLandlord, async (req: A
       return res.status(400).json({ error: 'Photo key and body required' });
     }
 
-    // Verify ownership
     const listing = await query(
       'SELECT id FROM listings WHERE id = $1 AND landlord_id = $2',
       [req.params.id, req.user!.id]

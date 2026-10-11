@@ -10,8 +10,8 @@ interface Listing {
   rent_amount: number;
   area: string;
   distance_from_kiu: number;
-  transport_time_boda: number;
-  transport_time_walk: number;
+  osrm_distance_km: number;
+  transport_info: string;
   electricity: string;
   water: string;
   kitchen: string;
@@ -77,7 +77,12 @@ export default function ListingDetail() {
       <div className="p-4 space-y-4">
         <div className="bg-white rounded-2xl p-4 border border-border">
           <p className="text-primary text-2xl font-bold">UGX {listing.rent_amount.toLocaleString()}/month</p>
-          <p className="text-muted text-sm mt-1">{listing.distance_from_kiu} km from KIU · ~{listing.transport_time_boda} min boda</p>
+          <p className="text-muted text-sm mt-1">
+            {listing.osrm_distance_km || listing.distance_from_kiu} km from KIU
+          </p>
+          {listing.transport_info && (
+            <p className="text-muted text-sm mt-1">🚗 {listing.transport_info}</p>
+          )}
         </div>
 
         <div className="bg-white rounded-2xl p-4 border border-border">

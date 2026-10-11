@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { query } from '../../db';
 import { authenticate, requireAdmin, AuthRequest } from '../../middleware/auth';
 import { uploadPhoto, deletePhoto } from '../../utils/storage';
-import { distanceFromKiu, bodaTime, walkTime } from '../../utils/distance';
+import { getRoadDistanceFromKiu } from '../../utils/distance';
 
 const router = Router();
 
@@ -20,6 +20,7 @@ const createListingSchema = z.object({
   flooring: z.enum(['TILED', 'CEMENTED']).optional(),
   otherCharges: z.string().optional(),
   landlordPhone: z.string().optional(),
+  transportInfo: z.string().optional(),
   latitude: z.number().optional(),
   longitude: z.number().optional()
 });
@@ -29,7 +30,7 @@ router.get('/', async (req, res) => {
   try {
     const { area, minRent, maxRent, houseType, maxDistance, kitchen, bathroom, toilet, electricity, water, sort, page = '1', limit = '20' } = req.query;
 
-    let sql = `SELECT id, title, house_type, rent_amount, area, distance_from_kiu, transport_time_boda, photos, status FROM listings WHERE status = 'AVAILABLE'`;
+    let sql = `SELECT id, title, house_type, rent_amount, area, distance_from_kiu, osrm_distance_km, transport_info, photos, status FROM listings WHERE status = 'AVAILABLE'`;
     const params: unknown[] = [];
     let paramCount = 0;
 
@@ -51,7 +52,7 @@ router.get('/', async (req, res) => {
     }
     if (maxDistance) {
       params.push(Number(maxDistance));
-      sql += ` AND distance_from_kiu <= $${++paramCount}`;
+      sql += ` AND osrm_distance_km <= $${++paramCount}`;
     }
     if (kitchen) {
       params.push(kitchen);
@@ -74,15 +75,13 @@ router.get('/', async (req, res) => {
       sql += ` AND water = $${++paramCount}`;
     }
 
-    // Sorting
     switch (sort) {
       case 'rent_asc': sql += ' ORDER BY rent_amount ASC'; break;
       case 'rent_desc': sql += ' ORDER BY rent_amount DESC'; break;
-      case 'distance_asc': sql += ' ORDER BY distance_from_kiu ASC'; break;
+      case 'distance_asc': sql += ' ORDER BY osrm_distance_km ASC'; break;
       default: sql += ' ORDER BY created_at DESC';
     }
 
-    // Pagination
     const offset = (Number(page) - 1) * Number(limit);
     params.push(Number(limit));
     sql += ` LIMIT $${++paramCount}`;
@@ -101,7 +100,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const result = await query(
-      `SELECT id, title, house_type, rent_amount, area, distance_from_kiu, transport_time_boda,
+      `SELECT id, title, house_type, rent_amount, area, distance_from_kiu, osrm_distance_km, transport_info,
         electricity, water, kitchen, bathroom, toilet, flooring, other_charges, photos, status
       FROM listings WHERE id = $1 AND status != 'SUSPENDED'`,
       [req.params.id]
@@ -142,21 +141,20 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
   try {
     const data = createListingSchema.parse(req.body);
 
-    let distance, boda, walk;
+    // Calculate road distance using OSRM if coordinates provided
+    let osrmDistance = null;
     if (data.latitude && data.longitude) {
-      distance = distanceFromKiu(data.latitude, data.longitude);
-      boda = bodaTime(distance);
-      walk = walkTime(distance);
+      osrmDistance = await getRoadDistanceFromKiu(data.latitude, data.longitude);
     }
 
     const result = await query(
-      `INSERT INTO listings (admin_id, title, house_type, rent_amount, area, distance_from_kiu,
-        transport_time_boda, transport_time_walk, electricity, water, kitchen, bathroom, toilet,
+      `INSERT INTO listings (admin_id, title, house_type, rent_amount, area, osrm_distance_ku,
+        transport_info, electricity, water, kitchen, bathroom, toilet,
         flooring, other_charges, landlord_phone, latitude, longitude)
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
       RETURNING *`,
       [req.user!.id, data.title, data.houseType, data.rentAmount, data.area,
-        distance || null, boda || null, walk || null,
+        osrmDistance, data.transportInfo || null,
         data.electricity || null, data.water || null, data.kitchen || null,
         data.bathroom || null, data.toilet || null, data.flooring || null,
         data.otherCharges || null, data.landlordPhone || null,
@@ -176,7 +174,7 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
 // Admin: update listing
 router.patch('/:id', authenticate, requireAdmin, async (req: AuthRequest, res) => {
   try {
-    const { title, rentAmount, area, status, landlordPhone, ...other } = req.body;
+    const { title, rentAmount, area, status, landlordPhone, transportInfo, ...other } = req.body;
     const updates: string[] = [];
     const params: unknown[] = [];
     let paramCount = 0;
@@ -186,6 +184,7 @@ router.patch('/:id', authenticate, requireAdmin, async (req: AuthRequest, res) =
     if (area) { params.push(area); updates.push(`area = $${++paramCount}`); }
     if (status) { params.push(status); updates.push(`status = $${++paramCount}`); }
     if (landlordPhone) { params.push(landlordPhone); updates.push(`landlord_phone = $${++paramCount}`); }
+    if (transportInfo) { params.push(transportInfo); updates.push(`transport_info = $${++paramCount}`); }
 
     for (const [key, value] of Object.entries(other)) {
       if (value !== undefined) {
@@ -265,11 +264,9 @@ router.delete('/:id/photos/:photoId', authenticate, requireAdmin, async (req: Au
       return res.status(404).json({ error: 'Photo not found' });
     }
 
-    // Delete from R2
     const key = photoUrl.split('/').pop();
     if (key) await deletePhoto(key);
 
-    // Remove from array
     const newPhotos = photos.filter((_: string, i: number) => i !== Number(req.params.photoId));
     await query('UPDATE listings SET photos = $1::jsonb, updated_at = now() WHERE id = $2', [JSON.stringify(newPhotos), req.params.id]);
 

@@ -7,7 +7,8 @@ interface Listing {
   rent_amount: number;
   area: string;
   distance_from_kiu: number;
-  transport_time_boda: number;
+  osrm_distance_km: number;
+  transport_info: string;
   photos: string[];
   status: string;
 }
@@ -49,8 +50,11 @@ export default function ListingCard({ listing }: Props) {
         <h3 className="font-bold text-sm text-text">{houseTypeLabel(listing.house_type)}</h3>
         <p className="text-primary font-bold text-base mt-0.5">{formatRent(listing.rent_amount)}</p>
         <p className="text-muted text-xs mt-0.5">
-          {listing.distance_from_kiu} km from KIU · ~{listing.transport_time_boda} min boda
+          {listing.osrm_distance_km || listing.distance_from_kiu} km from KIU
         </p>
+        {listing.transport_info && (
+          <p className="text-muted text-xs mt-0.5">🚗 {listing.transport_info}</p>
+        )}
         <p className="text-muted text-xs mt-0.5">{listing.area}</p>
         {listing.photos && listing.photos.length > 0 && (
           <p className="text-muted text-xs mt-1">📷 {listing.photos.length} photo(s)</p>
