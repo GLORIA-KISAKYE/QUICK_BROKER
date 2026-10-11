@@ -148,10 +148,10 @@ router.post('/', authenticate, requireAdmin, async (req: AuthRequest, res) => {
     }
 
     const result = await query(
-      `INSERT INTO listings (admin_id, title, house_type, rent_amount, area, osrm_distance_ku,
+      `INSERT INTO listings (admin_id, title, house_type, rent_amount, area, osrm_distance_km,
         transport_info, electricity, water, kitchen, bathroom, toilet,
         flooring, other_charges, landlord_phone, latitude, longitude)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
       RETURNING *`,
       [req.user!.id, data.title, data.houseType, data.rentAmount, data.area,
         osrmDistance, data.transportInfo || null,

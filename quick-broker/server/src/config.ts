@@ -4,7 +4,7 @@ dotenv.config();
 export const config = {
   port: parseInt(process.env.PORT || '3000', 10),
   nodeEnv: process.env.NODE_ENV || 'development',
-  databaseUrl: process.env.DATABASE_URL || 'postgresql://quickbroker:password@localhost:5432/quickbroker',
+  databaseUrl: process.env.DATABASE_URL || 'postgresql://quickbroker:quickbroker@localhost:5432/quickbroker',
   jwtSecret: process.env.JWT_SECRET || 'dev-secret-change-in-production',
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-in-production',
   jwtExpiresIn: '15m',

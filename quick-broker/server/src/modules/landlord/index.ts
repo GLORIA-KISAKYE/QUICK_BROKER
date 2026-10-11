@@ -58,7 +58,7 @@ router.post('/listings', authenticate, requireLandlord, async (req: AuthRequest,
       `INSERT INTO listings (landlord_id, title, house_type, rent_amount, area, osrm_distance_km,
         transport_info, electricity, water, kitchen, bathroom, toilet,
         flooring, other_charges, latitude, longitude)
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
       RETURNING *`,
       [req.user!.id, data.title, data.houseType, data.rentAmount, data.area,
         osrmDistance, data.transportInfo || null,
