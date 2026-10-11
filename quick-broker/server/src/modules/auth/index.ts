@@ -17,7 +17,7 @@ const verifyOtpSchema = z.object({
 const registerSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1),
-  role: z.enum(['STUDENT', 'LANDLORD'])
+  role: z.enum(['STUDENT', 'LANDLORD', 'ADMIN'])
 });
 
 // Verify OTP (legacy — kept for backward compatibility)
@@ -37,8 +37,8 @@ router.post('/verify-otp', async (req, res) => {
 
     await query('UPDATE auth_otp_codes SET used = TRUE WHERE id = $1', [id]);
 
-    let userResult = await query('SELECT id, email, name, role FROM profiles WHERE email = $1', [email]);
-    let user = userResult.rows[0];
+    const userResult = await query('SELECT id, email, name, role FROM profiles WHERE email = $1', [email]);
+    const user = userResult.rows[0];
     if (!user) return res.status(400).json({ error: 'User not registered' });
 
     const accessToken = jwt.sign({ userId: user.id, email: user.email, role: user.role }, config.jwtSecret, { expiresIn: config.jwtExpiresIn });
@@ -54,7 +54,7 @@ router.post('/verify-otp', async (req, res) => {
   }
 });
 
-// Register (Student or Landlord)
+// Register (Student, Landlord, or Admin)
 router.post('/register', async (req, res) => {
   try {
     const { email, name, role } = registerSchema.parse(req.body);
@@ -79,7 +79,6 @@ router.post('/send-otp', authLimiter, async (req, res) => {
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
     await query('UPDATE auth_otp_codes SET used = TRUE WHERE email = $1 AND used = FALSE', [email]);
     await query('INSERT INTO auth_otp_codes (email, code_hash, expires_at) VALUES ($1, $2, $3)', [email, codeHash, expiresAt]);
-    // Send via magic link email for consistency
     res.json({ message: 'Please use magic link login instead', isNewUser: false });
   } catch (error) {
     if (error instanceof z.ZodError) return res.status(400).json({ error: error.errors[0].message });

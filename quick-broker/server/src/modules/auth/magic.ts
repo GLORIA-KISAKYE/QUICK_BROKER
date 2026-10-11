@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import crypto from 'crypto';
-import { pool, query } from '../../db';
+import { query } from '../../db';
 import { config } from '../../config';
 import { sendMagicLinkEmail } from '../../utils/mail';
 import { authLimiter } from '../../middleware/rateLimit';
@@ -18,7 +18,7 @@ const emailSchema = z.object({
 const completeSchema = z.object({
   email: z.string().email(),
   name: z.string().min(1).optional(),
-  role: z.enum(['STUDENT', 'LANDLORD']).optional(),
+  role: z.enum(['STUDENT', 'LANDLORD', 'ADMIN']).optional(),
 });
 
 const verifyMagicSchema = z.object({
@@ -27,7 +27,7 @@ const verifyMagicSchema = z.object({
 
 function generateToken(): { plain: string; hash: string } {
   const plain = crypto.randomBytes(32).toString('hex');
-  return { plain, hash: plain }; // hash stored plainly for lookup, no need to bcrypt random token
+  return { plain, hash: plain };
 }
 
 async function issueTokens(user: { id: string; email: string; role: string }) {
@@ -53,12 +53,9 @@ async function issueTokens(user: { id: string; email: string; role: string }) {
 router.post('/magic', authLimiter, async (req, res) => {
   try {
     const { email } = emailSchema.parse(req.body);
-
-    // Check if user exists (we do NOT reveal this)
     const existing = await query('SELECT id FROM profiles WHERE email = $1', [email]);
     const isNewUser = existing.rows.length === 0;
 
-    // If new user, we still send the link; they complete profile after clicking
     const { plain, hash } = generateToken();
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
@@ -85,10 +82,9 @@ router.post('/magic/complete', async (req, res) => {
   try {
     const { email, name, role } = completeSchema.parse(req.body);
 
-    let result = await query('SELECT id, email, name, role FROM profiles WHERE email = $1', [email]);
+    const result = await query('SELECT id, email, name, role FROM profiles WHERE email = $1', [email]);
 
     if (result.rows.length === 0) {
-      // Create new user
       if (!name || !role) {
         return res.status(400).json({ error: 'Name and role required for new users' });
       }
@@ -96,7 +92,9 @@ router.post('/magic/complete', async (req, res) => {
         'INSERT INTO profiles (email, name, role) VALUES ($1, $2, $3) RETURNING id, email, name, role',
         [email, name, role],
       );
-      result = insert;
+      const user = insert.rows[0];
+      const tokens = await issueTokens(user);
+      return res.json({ ...tokens, user: { id: user.id, email: user.email, name: user.name, role: user.role } });
     }
 
     const user = result.rows[0];
@@ -130,11 +128,13 @@ router.get('/magic/verify', async (req, res) => {
     }
 
     const { email } = result.rows[0];
-
-    // Mark token as used
     await query('UPDATE auth_magic_tokens SET used = TRUE WHERE token_hash = $1', [token]);
 
-    res.json({ email });
+    // Check if user exists
+    const userResult = await query('SELECT id FROM profiles WHERE email = $1', [email]);
+    const isNewUser = userResult.rows.length === 0;
+
+    res.json({ email, isNewUser });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors[0].message });

@@ -12,7 +12,7 @@ export default function MagicLinkVerify() {
   const [email, setEmail] = useState('');
   const [isNewUser, setIsNewUser] = useState(false);
   const [name, setName] = useState('');
-  const [role, setRole] = useState<'STUDENT' | 'LANDLORD'>('STUDENT');
+  const [role, setRole] = useState<'STUDENT' | 'LANDLORD' | 'ADMIN'>('STUDENT');
 
   useEffect(() => {
     verifyToken();
@@ -24,17 +24,9 @@ export default function MagicLinkVerify() {
       const token = searchParams.get('token');
       if (!token) throw new Error('No token provided');
 
-      const data = await api<{ email: string }>(`/auth/magic/verify?token=${token}`);
+      const data = await api<{ email: string; isNewUser: boolean }>(`/auth/magic/verify?token=${token}`);
       setEmail(data.email);
-
-      // Check if user exists
-      try {
-        const user = await api<{ data: { id: string; email: string; name: string; role: string } }>('/users/me');
-        // User exists — but we need to login first. Let's check via a different approach
-      } catch {
-        setIsNewUser(true);
-      }
-
+      setIsNewUser(data.isNewUser);
       setLoading(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid or expired link');
@@ -60,6 +52,8 @@ export default function MagicLinkVerify() {
       login(data.accessToken, data.user);
       if (data.user.role === 'LANDLORD') {
         navigate('/landlord');
+      } else if (data.user.role === 'ADMIN') {
+        navigate('/admin');
       } else {
         navigate('/');
       }
@@ -116,11 +110,11 @@ export default function MagicLinkVerify() {
               required
               className="w-full px-4 py-3 rounded-xl border border-border bg-white text-sm"
             />
-            <div className="flex gap-3">
+            <div className="space-y-2">
               <button
                 type="button"
                 onClick={() => setRole('STUDENT')}
-                className={`flex-1 py-3 rounded-xl border-2 text-sm font-semibold ${
+                className={`w-full py-3 rounded-xl border-2 text-sm font-semibold ${
                   role === 'STUDENT' ? 'bg-primary text-white border-primary' : 'bg-white text-muted border-border'
                 }`}
               >
@@ -129,11 +123,20 @@ export default function MagicLinkVerify() {
               <button
                 type="button"
                 onClick={() => setRole('LANDLORD')}
-                className={`flex-1 py-3 rounded-xl border-2 text-sm font-semibold ${
+                className={`w-full py-3 rounded-xl border-2 text-sm font-semibold ${
                   role === 'LANDLORD' ? 'bg-primary text-white border-primary' : 'bg-white text-muted border-border'
                 }`}
               >
                 🏠 Landlord
+              </button>
+              <button
+                type="button"
+                onClick={() => setRole('ADMIN')}
+                className={`w-full py-3 rounded-xl border-2 text-sm font-semibold ${
+                  role === 'ADMIN' ? 'bg-primary text-white border-primary' : 'bg-white text-muted border-border'
+                }`}
+              >
+                ⚙️ Admin
               </button>
             </div>
             {error && <p className="text-danger text-sm">{error}</p>}

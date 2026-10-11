@@ -57,7 +57,6 @@ export default function Landing() {
           <h1 className="text-3xl font-bold text-white mb-2">Quick-Broker</h1>
           <p className="text-white/80 text-sm mb-8">Find the right student house without walking around Ishaka</p>
 
-          {/* Show logged-in user info */}
           {user && (
             <div className="mb-4 p-3 bg-white/20 rounded-xl">
               <p className="text-white text-sm">Welcome back, <strong>{user.name}</strong></p>
@@ -68,13 +67,12 @@ export default function Landing() {
           <div className="space-y-3">
             {user ? (
               <>
-                {/* Logged-in user — go directly to their interface */}
                 <button
-                  onClick={() => navigate(user.role === 'LANDLORD' ? '/landlord' : '/')}
+                  onClick={() => navigate(user.role === 'LANDLORD' ? '/landlord' : user.role === 'ADMIN' ? '/admin' : '/')}
                   className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg"
                 >
                   <div className="text-lg">
-                    {user.role === 'LANDLORD' ? '🏠 Go to Landlord Dashboard' : '🎓 Browse Listings'}
+                    {user.role === 'LANDLORD' ? '🏠 Go to Landlord Dashboard' : user.role === 'ADMIN' ? '⚙️ Go to Admin Dashboard' : '🎓 Browse Listings'}
                   </div>
                   <div className="text-sm opacity-70 mt-1">Continue as {user.name}</div>
                 </button>
@@ -88,7 +86,6 @@ export default function Landing() {
               </>
             ) : (
               <>
-                {/* New user — choose role */}
                 <button
                   onClick={() => navigate('/auth/login')}
                   className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg hover:shadow-xl transition-shadow"
