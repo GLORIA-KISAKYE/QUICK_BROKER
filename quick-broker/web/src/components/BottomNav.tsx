@@ -1,17 +1,18 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import HouseIcon from './HouseIcon';
 
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
 
   const items = [
-    { path: '/', icon: '🏠', label: 'Home' },
-    { path: '/saved', icon: '🔍', label: 'Search' },
-    { path: '/inspections', icon: '🔔', label: 'Alerts' },
-    { path: '/saved', icon: '👤', label: 'Profile' },
+    { path: '/', icon: <HouseIcon size={20} />, label: 'Home' },
+    { path: '/saved', icon: <span className="text-xl">🔍</span>, label: 'Search' },
+    { path: '/inspections', icon: <span className="text-xl">🔔</span>, label: 'Alerts' },
+    { path: '/saved', icon: <span className="text-xl">👤</span>, label: 'Profile' },
   ];
 
-  if (location.pathname.startsWith('/auth') || location.pathname.startsWith('/admin')) {
+  if (location.pathname.startsWith('/auth') || location.pathname.startsWith('/admin') || location.pathname.startsWith('/landlord')) {
     return null;
   }
 
@@ -25,7 +26,7 @@ export default function BottomNav() {
             location.pathname === item.path ? 'text-primary' : 'text-muted'
           }`}
         >
-          <span className="text-xl">{item.icon}</span>
+          {item.icon}
           <span className="text-xs">{item.label}</span>
         </button>
       ))}

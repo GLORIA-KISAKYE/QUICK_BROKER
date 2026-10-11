@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { api } from '../utils/api';
 import { useAuth } from '../context/AuthContext';
 import ListingCard from '../components/ListingCard';
+import HouseIcon from '../components/HouseIcon';
 
 interface Listing {
   id: string;
@@ -53,7 +54,9 @@ export default function Landing() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary to-secondary flex items-center justify-center p-4">
         <div className="w-full max-w-sm text-center">
-          <div className="text-6xl mb-4">🏠</div>
+          <div className="mb-4 flex justify-center">
+            <HouseIcon size={64} color="#fff" />
+          </div>
           <h1 className="text-3xl font-bold text-white mb-2">Quick-Broker</h1>
           <p className="text-white/80 text-sm mb-8">Find the right student house without walking around Ishaka</p>
 

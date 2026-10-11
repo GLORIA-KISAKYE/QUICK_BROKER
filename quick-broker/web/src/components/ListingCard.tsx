@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import HouseIcon from './HouseIcon';
 
 interface Listing {
   id: string;
@@ -40,8 +41,8 @@ export default function ListingCard({ listing }: Props) {
       onClick={() => navigate(`/listing/${listing.id}`)}
       className="bg-white rounded-2xl overflow-hidden border border-border mb-3 cursor-pointer hover:shadow-md transition-all duration-200 listing-card"
     >
-      <div className="h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-5xl relative">
-        🏠
+      <div className="h-32 bg-gradient-to-br from-primary to-secondary flex items-center justify-center relative">
+        <HouseIcon size={48} color="rgba(255,255,255,0.9)" />
         <div className="absolute top-2 right-2 w-7 h-7 bg-white rounded-full flex items-center justify-center text-sm shadow">
           ❤️
         </div>
