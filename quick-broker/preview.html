@@ -3,18 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Quick-Broker — Working Preview</title>
+<title>Quick-Broker — Interface Preview</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #1a1a1a; }
-.header { text-align: center; padding: 20px; background: #fff; }
-.header h1 { font-size: 22px; color: #1a1a1a; }
-.header p { color: #888; margin-top: 4px; font-size: 13px; }
-.tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 10px 20px; background: #fff; border-bottom: 1px solid #eee; }
-.tabs button { padding: 6px 14px; border: none; border-radius: 8px; background: #f5f5f5; color: #666; cursor: pointer; font-size: 12px; font-weight: 600; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a2e; color: #fff; }
+.header { text-align: center; padding: 20px; }
+.header h1 { font-size: 24px; color: #B07D4F; }
+.header p { color: #888; margin-top: 6px; font-size: 13px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 10px 20px; }
+.tabs button { padding: 8px 16px; border: none; border-radius: 8px; background: #16213e; color: #B07D4F; cursor: pointer; font-size: 12px; font-weight: 600; }
 .tabs button.active { background: #B07D4F; color: #fff; }
-.preview { display: flex; justify-content: center; padding: 20px; }
-.phone { width: 300px; height: 560px; background: #fff; border-radius: 24px; overflow: hidden; border: 3px solid #B07D4F; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.1); }
+.preview { display: flex; justify-content: center; padding: 20px; gap: 20px; flex-wrap: wrap; }
+.phone { width: 300px; height: 560px; background: #fff; border-radius: 24px; overflow: hidden; border: 3px solid #B07D4F; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.3); }
+.phone-label { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: #B07D4F; padding: 4px 12px; border-radius: 12px; font-size: 11px; color: #fff; font-weight: 600; z-index: 10; white-space: nowrap; }
 .status-bar { height: 24px; background: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 12px; font-size: 10px; color: #1a1a1a; }
 .app-bar { background: #fff; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #f0f0f0; }
 .app-bar .logo { width: 28px; height: 28px; background: #B07D4F; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 700; }
@@ -23,7 +24,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .content { padding: 10px; background: #f5f5f5; height: calc(100% - 44px); overflow-y: auto; }
 .search-bar { display: flex; gap: 6px; margin-bottom: 10px; }
 .search-bar input { flex: 1; padding: 8px 12px; border-radius: 20px; border: 1.5px solid #e0e0e0; background: #fff; color: #1a1a1a; font-size: 12px; outline: none; }
-.search-bar input:focus { border-color: #B07D4F; }
 .search-bar button { padding: 8px 14px; border-radius: 20px; border: none; background: #B07D4F; color: #fff; font-size: 12px; cursor: pointer; font-weight: 600; }
 .filters { display: flex; gap: 5px; margin-bottom: 10px; overflow-x: auto; padding-bottom: 4px; }
 .filter-chip { padding: 5px 12px; border-radius: 16px; font-size: 10px; white-space: nowrap; background: #fff; border: 1px solid #e0e0e0; color: #666; }
@@ -37,7 +37,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .listing-info .distance { font-size: 10px; color: #888; margin-top: 2px; }
 .listing-info .details { display: flex; gap: 5px; margin-top: 6px; flex-wrap: wrap; }
 .listing-info .detail-tag { font-size: 9px; padding: 2px 7px; border-radius: 6px; background: #f5f5f5; color: #666; }
-.listing-info .verified { display: flex; align-items: center; gap: 3px; margin-top: 6px; font-size: 9px; color: #28a745; font-weight: 600; }
 .btn { display: block; width: 100%; padding: 10px; border-radius: 12px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; }
 .btn-primary { background: #B07D4F; color: #fff; }
 .btn-outline { background: #fff; border: 1.5px solid #B07D4F; color: #B07D4F; margin-top: 6px; }
@@ -54,11 +53,6 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .tag { display: inline-block; padding: 3px 8px; border-radius: 16px; font-size: 9px; margin-right: 4px; margin-bottom: 3px; }
 .tag-green { background: #d4edda; color: #28a745; }
 .tag-brown { background: #f5e6d3; color: #B07D4F; }
-.otp-inputs { display: flex; gap: 8px; justify-content: center; margin: 20px 0; }
-.otp-box { width: 40px; height: 40px; border-radius: 10px; border: 1.5px solid #e0e0e0; background: #fff; color: #1a1a1a; text-align: center; font-size: 18px; font-weight: 700; }
-.code-display { text-align: center; padding: 30px 16px; }
-.code-display .code { font-size: 40px; font-weight: 700; letter-spacing: 10px; color: #B07D4F; margin: 16px 0; }
-.code-display .label { font-size: 12px; color: #888; }
 .stars { color: #ffc107; font-size: 14px; letter-spacing: 3px; }
 .review-card { background: #f9f9f9; border-radius: 10px; padding: 10px; margin-bottom: 6px; border: 1px solid #f0f0f0; }
 .review-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
@@ -72,169 +66,100 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .bottom-nav .nav-item { text-align: center; font-size: 9px; color: #888; }
 .bottom-nav .nav-item.active { color: #B07D4F; }
 .bottom-nav .nav-icon { font-size: 16px; display: block; margin-bottom: 2px; }
+.stat-card { background: #fff; border-radius: 16px; padding: 16px; border: 1px solid #f0f0f0; text-align: center; }
+.stat-card .value { font-size: 24px; font-weight: 700; color: #B07D4F; }
+.stat-card .label { font-size: 10px; color: #888; margin-top: 4px; }
+.menu-btn { width: 100%; padding: 12px; background: #fff; border: 1px solid #f0f0f0; border-radius: 12px; text-align: left; font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
 .hidden { display: none; }
 </style>
 </head>
 <body>
 <div class="header">
-  <h1>Quick-Broker</h1>
-  <p>Working Preview — Muzli-Inspired Design</p>
+  <h1>Quick-Broker — Interface Preview</h1>
+  <p>Click tabs to preview each interface</p>
 </div>
 <div class="tabs">
-  <button class="active" onclick="show(0)">Landing</button>
-  <button onclick="show(1)">Detail</button>
-  <button onclick="show(2)">Login</button>
-  <button onclick="show(3)">OTP</button>
-  <button onclick="show(4)">Code</button>
-  <button onclick="show(5)">Reviews</button>
-  <button onclick="show(6)">Compare</button>
-  <button onclick="show(7)">Saved</button>
+  <button class="active" onclick="show(0)">🏠 Landing</button>
+  <button onclick="show(1)">🎓 Student</button>
+  <button onclick="show(2)">🏠 Landlord</button>
+  <button onclick="show(3)">⚙️ Admin</button>
 </div>
 <div class="preview">
   <div class="phone">
 
-    <!-- Screen 1: Landing -->
+    <!-- Screen 1: Landing / Welcome -->
     <div id="screen-0">
+      <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
+      <div style="height: calc(100% - 24px); background: linear-gradient(135deg, #B07D4F, #D4A574); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center;">
+        <div style="font-size: 48px; margin-bottom: 12px;">🏠</div>
+        <h1 style="font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 6px;">Quick-Broker</h1>
+        <p style="color: rgba(255,255,255,0.8); font-size: 12px; margin-bottom: 24px;">Find the right student house without walking around Ishaka</p>
+        <div style="width: 100%; max-width: 240px; space-y: 8px;">
+          <button onclick="show(1)" style="width: 100%; padding: 12px; background: #fff; color: #B07D4F; border: none; border-radius: 16px; font-weight: 600; text-align: left; padding-left: 16px; margin-bottom: 8px; cursor: pointer;">
+            <div style="font-size: 15px;">✨ Log In / Sign Up</div>
+            <div style="font-size: 11px; opacity: 0.7; margin-top: 2px;">Magic link sent to your email</div>
+          </button>
+          <div style="text-align: center; margin-top: 4px;">
+            <span onclick="show(1)" style="color: rgba(255,255,255,0.8); font-size: 11px; text-decoration: underline; cursor: pointer;">Browse listings without an account →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Screen 2: Student Browse -->
+    <div id="screen-1" class="hidden">
       <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
       <div class="app-bar"><div class="logo">QB</div><span class="title">Quick-Broker</span><span class="menu">⋯</span></div>
       <div class="content">
         <div class="search-bar"><input placeholder="Search area, house type..."><button>Search</button></div>
         <div class="filters"><span class="filter-chip active">All</span><span class="filter-chip">Single</span><span class="filter-chip">Double</span><span class="filter-chip">Self-Cont.</span></div>
-        <div class="listing-card"><div class="listing-img">🏠<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Double Room</div><div class="rent">UGX 280,000/month</div><div class="distance">1.2 km from KIU · ~8 min boda</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Shared Bath</span></div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏡<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Self-Contained Single</div><div class="rent">UGX 350,000/month</div><div class="distance">800 m from KIU · ~5 min boda</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Private Bath</span></div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏢<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Single Room</div><div class="rent">UGX 180,000/month</div><div class="distance">2.5 km from KIU · ~15 min boda</div><div class="details"><span class="detail-tag">No Kitchen</span></div><div class="verified">✓ Identity Verified</div></div></div>
+        <div class="listing-card"><div class="listing-img">🏠<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Double Room</div><div class="rent">UGX 280,000/month</div><div class="distance">1.2 km from KIU · 🚗 10 min by boda, 25 min walk</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Shared Bath</span></div></div></div>
+        <div class="listing-card"><div class="listing-img">🏡<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Self-Contained Single</div><div class="rent">UGX 350,000/month</div><div class="distance">800 m from KIU · 🚗 5 min by boda, 12 min walk</div><div class="details"><span class="detail-tag">Kitchen</span><span class="detail-tag">Private Bath</span></div></div></div>
+        <div class="listing-card"><div class="listing-img">🏢<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Single Room</div><div class="rent">UGX 180,000/month</div><div class="distance">2.5 km from KIU · 🚗 15 min by boda, 35 min walk</div><div class="details"><span class="detail-tag">No Kitchen</span></div></div></div>
       </div>
       <div class="bottom-nav"><div class="nav-item active"><span class="nav-icon">🏠</span>Home</div><div class="nav-item"><span class="nav-icon">🔍</span>Search</div><div class="nav-item"><span class="nav-icon">🔔</span>Alerts</div><div class="nav-item"><span class="nav-icon">👤</span>Profile</div></div>
     </div>
 
-    <!-- Screen 2: Detail -->
-    <div id="screen-1" class="hidden">
-      <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">Listing Details</span><span class="menu">⋯</span></div>
-      <div class="detail-img">🏠<div class="back">←</div><div class="heart">❤️</div></div>
-      <div class="detail-body">
-        <div class="detail-title">Double Room — Kakoba</div>
-        <div class="detail-rent">UGX 280,000/month</div>
-        <div class="section-title">Location & Transport</div>
-        <div class="detail-row"><span class="label">Distance from KIU</span><span class="value">1.2 km</span></div>
-        <div class="detail-row"><span class="label">Boda time</span><span class="value">~8 minutes</span></div>
-        <div class="section-title">Facilities</div>
-        <div class="detail-row"><span class="label">Kitchen</span><span class="value">Present</span></div>
-        <div class="detail-row"><span class="label">Bathroom</span><span class="value">Shared</span></div>
-        <div class="detail-row"><span class="label">Toilet</span><span class="value">Shared</span></div>
-        <div class="section-title">Utilities</div>
-        <div class="detail-row"><span class="label">Electricity</span><span class="value">Shared bill</span></div>
-        <div class="detail-row"><span class="label">Water</span><span class="value">Community tap</span></div>
-        <div class="section-title">Status</div>
-        <div><span class="tag tag-green">✓ Available</span><span class="tag tag-brown">✓ Verified Landlord</span></div>
-        <div style="margin-top:12px;"><button class="btn btn-primary">📅 Request Inspection</button><button class="btn btn-outline">📞 Call Landlord</button><button class="btn btn-outline">💬 WhatsApp</button></div>
-      </div>
-    </div>
-
-    <!-- Screen 3: Login -->
+    <!-- Screen 3: Landlord Dashboard -->
     <div id="screen-2" class="hidden">
       <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">Quick-Broker</span><span class="menu"></span></div>
-      <div class="content" style="padding:30px 20px;text-align:center;">
-        <div style="font-size:40px;margin:30px 0 12px;">🏠</div>
-        <h2 style="font-size:18px;color:#1a1a1a;">Welcome Back</h2>
-        <p style="font-size:12px;color:#888;margin:6px 0 24px;">Enter your email to receive a login code</p>
-        <input placeholder="your@email.com" style="width:100%;padding:12px 14px;border-radius:20px;border:1.5px solid #e0e0e0;background:#fff;color:#1a1a1a;font-size:12px;margin-bottom:12px;">
-        <button class="btn btn-primary">Send Login Code</button>
-        <p style="font-size:10px;color:#aaa;margin-top:12px;">We'll email you a 6-digit code to verify your account.</p>
+      <div class="app-bar"><div class="logo">QB</div><span class="title">Landlord Dashboard</span><span class="menu">⋯</span></div>
+      <div class="content" style="padding: 12px;">
+        <p style="font-size: 11px; color: #888; margin-bottom: 12px;">Welcome, Demo Landlord</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+          <div class="stat-card"><div class="value">3</div><div class="label">My Listings</div></div>
+          <div class="stat-card"><div class="value">5</div><div class="label">Inspections</div></div>
+          <div class="stat-card"><div class="value">2</div><div class="label">Pending</div></div>
+        </div>
+        <div class="menu-btn">📝 My Listings</div>
+        <div class="menu-btn">📋 Inspection Requests</div>
+        <div class="menu-btn">✅ Verify Identity</div>
       </div>
     </div>
 
-    <!-- Screen 4: OTP -->
+    <!-- Screen 4: Admin Dashboard -->
     <div id="screen-3" class="hidden">
       <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">Verify Email</span><span class="menu"></span></div>
-      <div class="content" style="padding:30px 20px;text-align:center;">
-        <div style="font-size:30px;margin:20px 0 10px;">📧</div>
-        <h2 style="font-size:16px;color:#1a1a1a;">Check Your Email</h2>
-        <p style="font-size:11px;color:#888;margin:6px 0 20px;">Enter the 6-digit code sent to your@email.com</p>
-        <div class="otp-inputs"><input class="otp-box" value="4"><input class="otp-box" value="8"><input class="otp-box" value="3"><input class="otp-box" value="9"><input class="otp-box" value="2"><input class="otp-box" value="0"></div>
-        <button class="btn btn-primary">Verify & Login</button>
-        <p style="font-size:11px;color:#888;margin-top:12px;">Didn't receive it? <span style="color:#B07D4F;font-weight:600;">Resend code</span></p>
-      </div>
-    </div>
-
-    <!-- Screen 5: Code -->
-    <div id="screen-4" class="hidden">
-      <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">Inspection Code</span><span class="menu"></span></div>
-      <div class="code-display">
-        <div class="label">Show this code to the landlord</div>
-        <div class="code">483920</div>
-        <div class="label">Expires in 23:45:12</div>
-        <div style="margin-top:20px;">
-          <div class="review-card" style="text-align:left;"><div class="name">Double Room — Kakoba</div><div style="font-size:10px;color:#888;margin-top:3px;">Tomorrow, 10:00 AM · 1.2 km from KIU</div></div>
-          <button class="btn btn-primary" style="margin-top:12px;">📞 Call Landlord</button>
+      <div class="app-bar"><div class="logo">QB</div><span class="title">Admin Dashboard</span><span class="menu">⋯</span></div>
+      <div class="content" style="padding: 12px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+          <div class="stat-card"><div class="value">12</div><div class="label">Total Listings</div></div>
+          <div class="stat-card"><div class="value">45</div><div class="label">Students</div></div>
+          <div class="stat-card"><div class="value">8</div><div class="label">Landlords</div></div>
+          <div class="stat-card"><div class="value">23</div><div class="label">Inspections</div></div>
         </div>
+        <div class="menu-btn">📝 Manage Listings</div>
+        <div class="menu-btn">📋 Manage Inspections</div>
+        <div class="menu-btn">⚠️ View Reports</div>
+        <div class="menu-btn">✅ Landlord Verifications</div>
       </div>
-    </div>
-
-    <!-- Screen 6: Reviews -->
-    <div id="screen-5" class="hidden">
-      <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">Reviews</span><span class="menu"></span></div>
-      <div class="detail-body">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-          <div><div style="font-size:14px;font-weight:700;color:#1a1a1a;">Double Room — Kakoba</div><div class="stars">★★★★★</div></div>
-          <div style="margin-left:auto;text-align:right;"><div style="font-size:20px;font-weight:700;color:#B07D4F;">4.6</div><div style="font-size:10px;color:#888;">12 reviews</div></div>
-        </div>
-        <div class="section-title">Rating Breakdown</div>
-        <div class="detail-row"><span class="label">Accuracy</span><span class="value">★★★★☆</span></div>
-        <div class="detail-row"><span class="label">Water</span><span class="value">★★★☆☆</span></div>
-        <div class="detail-row"><span class="label">Electricity</span><span class="value">★★★★★</span></div>
-        <div class="detail-row"><span class="label">Location</span><span class="value">★★★★★</span></div>
-        <div class="section-title">Recent Reviews</div>
-        <div class="review-card"><div class="header"><span class="name">Sarah K.</span><span class="stars">★★★★★</span></div><div class="comment">Accurate listing. Water is reliable and the landlord is great. Close to campus!</div></div>
-        <div class="review-card"><div class="header"><span class="name">John M.</span><span>★★★★☆</span></div><div class="comment">Good value. Electricity is shared but works well. Boda ride is quick.</div></div>
-        <div class="review-card"><div class="header"><span class="name">Grace A.</span><span>★★★★★</span></div><div class="comment">Exactly as described. Safe area, friendly neighbors. Highly recommend!</div></div>
-        <div style="margin-top:12px;"><button class="btn btn-primary">✍️ Write a Review</button></div>
-      </div>
-    </div>
-
-    <!-- Screen 7: Compare -->
-    <div id="screen-6" class="hidden">
-      <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">Compare Houses</span><span class="menu"></span></div>
-      <div class="content" style="overflow-x:auto;">
-        <table class="compare-table">
-          <tr><th>Feature</th><th>🏠 A</th><th>🏡 B</th></tr>
-          <tr><td>Rent</td><td style="color:#B07D4F;font-weight:700;">280k</td><td style="color:#B07D4F;font-weight:700;">350k</td></tr>
-          <tr><td>Distance</td><td>1.2 km</td><td>800 m</td></tr>
-          <tr><td>Boda Time</td><td>8 min</td><td>5 min</td></tr>
-          <tr><td>Type</td><td>Double</td><td>Self-Cont.</td></tr>
-          <tr><td>Kitchen</td><td>✅</td><td>✅</td></tr>
-          <tr><td>Bathroom</td><td>Shared</td><td>Private</td></tr>
-          <tr><td>Toilet</td><td>Shared</td><td>Private</td></tr>
-          <tr><td>Electricity</td><td>Shared</td><td>Personal</td></tr>
-          <tr><td>Water</td><td>Community</td><td>Included</td></tr>
-          <tr><td>Rating</td><td>★★★★★ 4.6</td><td>★★★★☆ 4.2</td></tr>
-        </table>
-        <div style="display:flex;gap:6px;margin-top:10px;"><button class="btn btn-primary" style="flex:1;">📅 Inspect A</button><button class="btn btn-primary" style="flex:1;">📅 Inspect B</button></div>
-      </div>
-    </div>
-
-    <!-- Screen 8: Saved -->
-    <div id="screen-7" class="hidden">
-      <div class="status-bar"><span>9:41</span><span>100% 5G</span></div>
-      <div class="app-bar"><div class="logo">QB</div><span class="title">My Saved Houses</span><span class="menu"></span></div>
-      <div class="content">
-        <div class="listing-card"><div class="listing-img">🏠<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Double Room — Kakoba</div><div class="rent">UGX 280,000/month</div><div class="distance">1.2 km from KIU · ~8 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏡<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Self-Contained Single</div><div class="rent">UGX 350,000/month</div><div class="distance">800 m from KIU · ~5 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
-        <div class="listing-card"><div class="listing-img">🏢<div class="heart">❤️</div></div><div class="listing-info"><div class="type">Single Room — Ishaka Town</div><div class="rent">UGX 180,000/month</div><div class="distance">2.5 km from KIU · ~15 min boda</div><div class="verified">✓ Identity Verified</div></div></div>
-      </div>
-      <div class="bottom-nav"><div class="nav-item"><span class="nav-icon">🏠</span>Home</div><div class="nav-item"><span class="nav-icon">🔍</span>Search</div><div class="nav-item"><span class="nav-icon">🔔</span>Alerts</div><div class="nav-item"><span class="nav-icon">👤</span>Profile</div></div>
     </div>
 
   </div>
 </div>
 <script>
 function show(n) {
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 4; i++) {
     document.getElementById('screen-' + i).classList.add('hidden');
   }
   document.getElementById('screen-' + n).classList.remove('hidden');

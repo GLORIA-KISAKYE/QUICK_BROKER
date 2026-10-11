@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRoutes from './modules/auth';
 import magicRoutes from './modules/auth/magic';
+import demoRoutes from './modules/demo';
 import listingRoutes from './modules/listings';
 import inspectionRoutes from './modules/inspections';
 import reviewRoutes from './modules/reviews';
@@ -15,6 +16,7 @@ const router = Router();
 
 router.use('/auth', authRoutes);
 router.use('/auth', magicRoutes);
+router.use('/demo', demoRoutes);
 router.use('/listings', listingRoutes);
 router.use('/inspections', inspectionRoutes);
 router.use('/reviews', reviewRoutes);
