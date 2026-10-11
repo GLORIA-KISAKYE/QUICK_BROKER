@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { api } from '../utils/api';
 
 export default function Register() {
@@ -10,13 +10,18 @@ export default function Register() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
 
   useEffect(() => {
     const roleParam = searchParams.get('role');
     if (roleParam === 'LANDLORD' || roleParam === 'STUDENT') {
       setRole(roleParam);
     }
-  }, [searchParams]);
+    const emailParam = (location.state as { email?: string })?.email;
+    if (emailParam) {
+      setEmail(emailParam);
+    }
+  }, [searchParams, location]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

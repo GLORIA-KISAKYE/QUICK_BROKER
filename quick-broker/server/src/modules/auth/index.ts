@@ -10,7 +10,7 @@ import { authenticate, AuthRequest } from '../../middleware/auth';
 
 const router = Router();
 
-const sendOtpSchema = z.object({
+const emailSchema = z.object({
   email: z.string().email()
 });
 
@@ -25,11 +25,44 @@ const registerSchema = z.object({
   role: z.enum(['STUDENT', 'LANDLORD'])
 });
 
-// Send OTP
+// Send OTP (for new users) or direct login (for existing users)
 router.post('/send-otp', authLimiter, async (req, res) => {
   try {
-    const { email } = sendOtpSchema.parse(req.body);
+    const { email } = emailSchema.parse(req.body);
 
+    // Check if user already exists
+    const existingUser = await query('SELECT id, email, name, role FROM profiles WHERE email = $1', [email]);
+
+    if (existingUser.rows.length > 0) {
+      // Existing user — direct login, no OTP needed
+      const user = existingUser.rows[0];
+      const accessToken = jwt.sign(
+        { userId: user.id, email: user.email, role: user.role },
+        config.jwtSecret,
+        { expiresIn: config.jwtExpiresIn }
+      );
+
+      const refreshToken = jwt.sign(
+        { userId: user.id },
+        config.jwtRefreshSecret,
+        { expiresIn: config.jwtRefreshExpiresIn }
+      );
+
+      const refreshHash = await bcrypt.hash(refreshToken, 10);
+      await query(
+        'INSERT INTO auth_refresh_tokens (user_id, token_hash, expires_at) VALUES ($1, $2, $3)',
+        [user.id, refreshHash, new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)]
+      );
+
+      return res.json({
+        accessToken,
+        refreshToken,
+        user: { id: user.id, email: user.email, name: user.name, role: user.role },
+        isNewUser: false
+      });
+    }
+
+    // New user — send OTP
     const code = Math.floor(100000 + Math.random() * 900000).toString();
     const codeHash = await bcrypt.hash(code, 10);
     const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
@@ -46,7 +79,7 @@ router.post('/send-otp', authLimiter, async (req, res) => {
       return res.status(500).json({ error: 'Failed to send email' });
     }
 
-    res.json({ message: 'OTP sent successfully' });
+    res.json({ message: 'OTP sent successfully', isNewUser: true });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({ error: error.errors[0].message });
@@ -56,7 +89,7 @@ router.post('/send-otp', authLimiter, async (req, res) => {
   }
 });
 
-// Verify OTP
+// Verify OTP (only for new users)
 router.post('/verify-otp', async (req, res) => {
   try {
     const { email, code } = verifyOtpSchema.parse(req.body);
@@ -79,7 +112,7 @@ router.post('/verify-otp', async (req, res) => {
 
     await query('UPDATE auth_otp_codes SET used = TRUE WHERE id = $1', [id]);
 
-    let userResult = await query('SELECT id, email, role FROM profiles WHERE email = $1', [email]);
+    let userResult = await query('SELECT id, email, name, role FROM profiles WHERE email = $1', [email]);
     let user = userResult.rows[0];
 
     if (!user) {
@@ -107,7 +140,7 @@ router.post('/verify-otp', async (req, res) => {
     res.json({
       accessToken,
       refreshToken,
-      user: { id: user.id, email: user.email, role: user.role }
+      user: { id: user.id, email: user.email, name: user.name, role: user.role }
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -129,7 +162,7 @@ router.post('/register', async (req, res) => {
     }
 
     const result = await query(
-      'INSERT INTO profiles (email, name, role) VALUES ($1, $2, $3) RETURNING id, email, role',
+      'INSERT INTO profiles (email, name, role) VALUES ($1, $2, $3) RETURNING id, email, name, role',
       [email, name, role]
     );
 
@@ -170,7 +203,7 @@ router.post('/refresh', async (req, res) => {
       return res.status(401).json({ error: 'Invalid refresh token' });
     }
 
-    const userResult = await query('SELECT id, email, role FROM profiles WHERE id = $1', [decoded.userId]);
+    const userResult = await query('SELECT id, email, name, role FROM profiles WHERE id = $1', [decoded.userId]);
     if (userResult.rows.length === 0) {
       return res.status(401).json({ error: 'User not found' });
     }

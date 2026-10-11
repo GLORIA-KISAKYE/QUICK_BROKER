@@ -1468,7 +1468,7 @@ Can I arrange an inspection?
 
 ## 27. Architecture & Design Decisions (v1 Implementation)
 
-**Date:** 2026-09-28
+**Date:** 2026-09-28 (updated 2026-10-11)
 **Status:** Implemented
 
 This section documents all architectural and design decisions made during implementation, including rationale for each change from the original PRD.
@@ -1494,6 +1494,7 @@ This section documents all architectural and design decisions made during implem
 | **ORM** | Not specified | **None** — raw SQL with `pg` (node-postgres) | User requirement. No abstraction layer — full control over queries, no ORM learning curve, no dependency bloat. |
 | **API style** | Not specified | REST (JSON) | Simple, well-understood, easy to test. Auto-generated from route definitions. |
 | **Authentication** | Not specified | JWT (access + refresh tokens) | Stateless, scalable, standard. Access token (15 min) + refresh token (7 days). Stored in httpOnly cookies for security. |
+| **Auth flow (updated)** | Email OTP for all logins | **Email OTP for new users only; existing users get instant access** | User requirement (Oct 2026). Returning users enter their email and are logged in immediately — no OTP, no password. New users verify with OTP during registration only. |
 
 ---
 

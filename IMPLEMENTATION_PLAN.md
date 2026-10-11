@@ -622,42 +622,51 @@ GET    /api/listings/:id/contact  # Authenticated only
 ## Phase 2: Authentication & User Management
 
 **Duration:** 2–3 days
-**Goal:** Email OTP auth (ZeptoMail + JWT), student profiles only
+**Goal:** Email-based auth — OTP for new users only, instant access for returning users
+
+### Auth Flow
+
+```
+User enters email
+        ↓
+POST /api/auth/send-otp { email }
+        ↓
+┌───────────────────────────────────┐
+│  Is email already registered?     │
+├───────────────────────────────────┤
+│  YES → Return JWT directly        │  ← Existing user: instant access
+│  NO  → Send OTP email             │  ← New user: verify with code
+└───────────────────────────────────┘
+        ↓ (new user only)
+User enters name + role (Student/Landlord)
+        ↓
+User enters 6-digit code
+        ↓
+POST /api/auth/verify-otp { email, code }
+        ↓
+Server verifies → returns { accessToken, refreshToken }
+        ↓
+User logged in → JWT stored in localStorage
+        ↓
+Redirect to role-specific interface
+  - Student → Browse listings
+  - Landlord → Landlord Dashboard
+```
 
 ### Tasks
 
 | # | Task | Details |
 |---|------|---------|
 | 2.1 | ZeptoMail setup | Create account, get API key, configure sandbox mode |
-| 2.2 | Send OTP endpoint | `POST /api/auth/send-otp` — generates code, emails via ZeptoMail |
-| 2.3 | Verify OTP endpoint | `POST /api/auth/verify-otp` — returns JWT access + refresh tokens |
-| 2.4 | JWT middleware | Verify access token on protected routes |
-| 2.5 | Profile creation | On first signup, insert into `profiles` table |
+| 2.2 | Send OTP / Direct login endpoint | `POST /api/auth/send-otp` — checks if user exists; if yes, returns JWT directly; if no, sends OTP |
+| 2.3 | Verify OTP endpoint | `POST /api/auth/verify-otp` — verifies code for new users, returns JWT |
+| 2.4 | Register endpoint | `POST /api/auth/register` — creates new user (Student or Landlord) |
+| 2.5 | JWT middleware | Verify access token on protected routes |
 | 2.6 | Get profile endpoint | `GET /api/users/me` |
 | 2.7 | Update profile endpoint | `PATCH /api/users/me` |
 | 2.8 | Refresh token endpoint | `POST /api/auth/refresh` |
 | 2.9 | Logout endpoint | `POST /api/auth/logout` — invalidate refresh token |
-| 2.10 | Auth state management | React context, protected routes |
-
-### Email OTP Flow
-
-```
-Student enters email
-        ↓
-POST /api/auth/send-otp { email }
-        ↓
-Server generates 6-digit code → stores hashed in DB (expires 10 min)
-        ↓
-ZeptoMail sends email with code
-        ↓
-Student enters code
-        ↓
-POST /api/auth/verify-otp { email, code }
-        ↓
-Server verifies → returns { accessToken, refreshToken }
-        ↓
-Student logged in → JWT stored in httpOnly cookie
-```
+| 2.10 | Auth state management | React context, role-based redirects |
 
 ### Key Dependencies
 
@@ -672,10 +681,19 @@ Student logged in → JWT stored in httpOnly cookie
   "express-rate-limit": "^7.0.0",
   "node-cron": "^3.0.0",
   "zod": "^3.22.0",
-  "multer": "^1.4.5",
-  "@aws-sdk/client-s3": "^3.600.0"
+  "multer": "^1.4.5-lts.1",
+  "@aws-sdk/client-s3": "^3.600.0",
+  "dotenv": "^16.3.0"
 }
 ```
+
+### User Roles
+
+| Role | Access | Redirect |
+|------|--------|----------|
+| **Student** | Browse listings, search, save, compare, request inspections, contact landlords | `/` (browse) |
+| **Landlord** | Manage own listings, accept/decline/verify inspections, submit identity verification | `/landlord` (dashboard) |
+| **Admin** | Manage all listings, verify landlords, review reports, suspend listings | `/admin` (dashboard) |
 
 ### Deliverables
 - [ ] Email OTP sign in/sign up working (ZeptoMail)
