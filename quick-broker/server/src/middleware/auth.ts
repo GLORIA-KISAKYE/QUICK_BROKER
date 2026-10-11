@@ -7,7 +7,7 @@ export interface AuthRequest extends Request {
   user?: {
     id: string;
     email: string;
-    role: 'STUDENT' | 'ADMIN';
+    role: 'STUDENT' | 'LANDLORD' | 'ADMIN';
   };
 }
 
@@ -19,7 +19,7 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     }
 
     const token = authHeader.split(' ')[1];
-    const decoded = jwt.verify(token, config.jwtSecret) as { userId: string; email: string; role: 'STUDENT' | 'ADMIN' };
+    const decoded = jwt.verify(token, config.jwtSecret) as { userId: string; email: string; role: 'STUDENT' | 'LANDLORD' | 'ADMIN' };
 
     const result = await query('SELECT id, email, role FROM profiles WHERE id = $1', [decoded.userId]);
     if (result.rows.length === 0) {
@@ -36,6 +36,13 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
 export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
   if (req.user?.role !== 'ADMIN') {
     return res.status(403).json({ error: 'Admin access required' });
+  }
+  next();
+};
+
+export const requireLandlord = (req: AuthRequest, res: Response, next: NextFunction) => {
+  if (req.user?.role !== 'LANDLORD' && req.user?.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Landlord access required' });
   }
   next();
 };
