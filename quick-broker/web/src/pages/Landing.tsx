@@ -11,7 +11,8 @@ interface Listing {
   rent_amount: number;
   area: string;
   distance_from_kiu: number;
-  transport_time_boda: number;
+  osrm_distance_km: number;
+  transport_info: string;
   photos: string[];
   status: string;
 }
@@ -89,19 +90,11 @@ export default function Landing() {
               <>
                 {/* New user — choose role */}
                 <button
-                  onClick={() => navigate('/auth/register?role=STUDENT')}
+                  onClick={() => navigate('/auth/login')}
                   className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg hover:shadow-xl transition-shadow"
                 >
-                  <div className="text-lg">🎓 I'm a Student</div>
-                  <div className="text-sm opacity-70 mt-1">Find housing near KIU</div>
-                </button>
-
-                <button
-                  onClick={() => navigate('/auth/register?role=LANDLORD')}
-                  className="w-full py-4 bg-white/20 text-white border-2 border-white rounded-2xl font-semibold text-left px-5 hover:bg-white/30 transition-colors"
-                >
-                  <div className="text-lg">🏠 I'm a Landlord</div>
-                  <div className="text-sm opacity-80 mt-1">List my properties</div>
+                  <div className="text-lg">✨ Log In / Sign Up</div>
+                  <div className="text-sm opacity-70 mt-1">Magic link sent to your email</div>
                 </button>
 
                 <button
