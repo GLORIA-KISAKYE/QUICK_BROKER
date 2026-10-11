@@ -21,14 +21,13 @@ export default function Landing() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [houseType, setHouseType] = useState('');
-  const [showRoleSelect, setShowRoleSelect] = useState(false);
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
-    // Redirect landlords to their dashboard
     if (user?.role === 'LANDLORD') {
       navigate('/landlord');
+      return;
     }
     fetchListings();
   }, [search, houseType, user, navigate]);
@@ -49,67 +48,81 @@ export default function Landing() {
     }
   };
 
-  // Show role selection for unauthenticated users
-  if (!user && showRoleSelect) {
+  // Role selection screen (shown by default when not logged in)
+  if (!user) {
     return (
-      <div className="min-h-screen bg-accent flex items-center justify-center p-4">
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
-            <div className="text-5xl mb-4">🏠</div>
-            <h1 className="text-2xl font-bold text-text">Join Quick-Broker</h1>
-            <p className="text-muted text-sm mt-1">Choose how you want to use the app</p>
+      <div className="min-h-screen bg-accent flex flex-col">
+        {/* Hero Section */}
+        <div className="bg-gradient-to-br from-primary to-secondary p-8 text-center">
+          <div className="text-6xl mb-4">🏠</div>
+          <h1 className="text-3xl font-bold text-white">Quick-Broker</h1>
+          <p className="text-white/80 mt-2">Find the right student house without walking around Ishaka</p>
+        </div>
+
+        {/* Role Selection */}
+        <div className="flex-1 flex items-center justify-center p-6">
+          <div className="w-full max-w-sm">
+            <h2 className="text-xl font-bold text-text text-center mb-6">How do you want to use Quick-Broker?</h2>
+
+            <div className="space-y-4">
+              <button
+                onClick={() => navigate('/auth/register?role=STUDENT')}
+                className="w-full py-5 bg-primary text-white rounded-2xl font-semibold text-left px-6 shadow-lg hover:shadow-xl transition-shadow"
+              >
+                <div className="text-xl">🎓 I'm a Student</div>
+                <div className="text-sm opacity-80 mt-1">Find housing near KIU</div>
+              </button>
+
+              <button
+                onClick={() => navigate('/auth/register?role=LANDLORD')}
+                className="w-full py-5 bg-white border-2 border-primary text-primary rounded-2xl font-semibold text-left px-6 hover:bg-accent transition-colors"
+              >
+                <div className="text-xl">🏠 I'm a Landlord</div>
+                <div className="text-sm opacity-80 mt-1">List my properties</div>
+              </button>
+            </div>
+
+            <p className="text-center text-muted text-sm mt-6">
+              Already have an account?{' '}
+              <button onClick={() => navigate('/auth/login')} className="text-primary font-semibold">
+                Login
+              </button>
+            </p>
           </div>
+        </div>
 
-          <div className="space-y-3">
-            <button
-              onClick={() => navigate('/auth/register?role=STUDENT')}
-              className="w-full py-4 bg-primary text-white rounded-2xl font-semibold text-left px-5"
-            >
-              <div className="text-lg">🎓 I'm a Student</div>
-              <div className="text-sm opacity-80 mt-1">Find housing near KIU</div>
-            </button>
-
-            <button
-              onClick={() => navigate('/auth/register?role=LANDLORD')}
-              className="w-full py-4 bg-white border-2 border-primary text-primary rounded-2xl font-semibold text-left px-5"
-            >
-              <div className="text-lg">🏠 I'm a Landlord</div>
-              <div className="text-sm opacity-80 mt-1">List my properties</div>
-            </button>
-
-            <button
-              onClick={() => setShowRoleSelect(false)}
-              className="w-full py-2 text-muted text-sm"
-            >
-              ← Back to browsing
-            </button>
+        {/* Preview Section */}
+        <div className="p-4 border-t border-border bg-white">
+          <p className="text-muted text-xs text-center mb-3">Available listings</p>
+          <div className="space-y-2">
+            {loading ? (
+              <div className="skeleton h-20 rounded-xl"></div>
+            ) : (
+              listings.slice(0, 2).map((listing) => (
+                <div key={listing.id} className="bg-accent rounded-xl p-3 flex items-center gap-3">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center text-xl">🏠</div>
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm text-text">{listing.house_type.replace(/_/g, ' ')}</p>
+                    <p className="text-muted text-xs">{listing.area}</p>
+                  </div>
+                  <p className="text-primary font-bold text-sm">UGX {listing.rent_amount.toLocaleString()}</p>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
     );
   }
 
+  // Student view (logged in)
   return (
     <div className="min-h-screen bg-accent pb-20">
-      {/* Header */}
       <div className="bg-white p-4 border-b border-border">
-        <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-text text-xl font-bold">Quick-Broker</h1>
-            <p className="text-muted text-xs">Find student housing in Ishaka</p>
-          </div>
-          {!user && (
-            <button
-              onClick={() => setShowRoleSelect(true)}
-              className="px-4 py-2 bg-primary text-white rounded-full text-sm font-semibold"
-            >
-              Sign Up
-            </button>
-          )}
-        </div>
+        <h1 className="text-text text-xl font-bold">Quick-Broker</h1>
+        <p className="text-muted text-xs">Find student housing in Ishaka</p>
       </div>
 
-      {/* Search */}
       <div className="p-3">
         <div className="flex gap-2 mb-3">
           <input
@@ -127,7 +140,6 @@ export default function Landing() {
           </button>
         </div>
 
-        {/* Filters */}
         <div className="flex gap-2 overflow-x-auto pb-2">
           {['', 'SINGLE_ROOM', 'DOUBLE_ROOM', 'SELF_CONTAINED_SINGLE'].map((type) => (
             <button
@@ -145,7 +157,6 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Listings */}
       <div className="px-3">
         {loading ? (
           <div className="text-center py-8 text-muted">Loading...</div>

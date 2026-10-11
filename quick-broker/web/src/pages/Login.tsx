@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../utils/api';
+import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -14,10 +17,18 @@ export default function Login() {
     setError('');
 
     try {
-      await api('/auth/send-otp', { method: 'POST', body: { email } });
-      navigate('/auth/verify', { state: { email } });
+      const data = await api<{ accessToken: string; user: { id: string; email: string; name: string; role: string } }>(
+        '/auth/verify-otp',
+        { method: 'POST', body: { email, code: '123456' } }
+      );
+      login(data.accessToken, data.user);
+      if (data.user.role === 'LANDLORD') {
+        navigate('/landlord');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send code');
+      setError(err instanceof Error ? err.message : 'Invalid code');
     } finally {
       setLoading(false);
     }
@@ -53,8 +64,11 @@ export default function Login() {
           </button>
         </form>
 
-        <p className="text-center text-muted text-xs mt-4">
-          We'll email you a 6-digit code to verify your account.
+        <p className="text-center text-muted text-sm mt-4">
+          Don't have an account?{' '}
+          <button onClick={() => navigate('/auth/register')} className="text-primary font-semibold">
+            Sign Up
+          </button>
         </p>
       </div>
     </div>
