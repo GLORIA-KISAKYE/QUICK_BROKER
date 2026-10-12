@@ -14,8 +14,11 @@ export default function Login() {
     setError('');
 
     try {
-      await api('/auth/magic', { method: 'POST', body: { email } });
-      navigate('/auth/magic-sent', { state: { email }, replace: true });
+      const data = await api<{ isNewUser: boolean; magicLink?: string }>('/auth/magic', {
+        method: 'POST',
+        body: { email },
+      });
+      navigate('/auth/magic-sent', { state: { email, magicLink: data.magicLink }, replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to send link');
     } finally {

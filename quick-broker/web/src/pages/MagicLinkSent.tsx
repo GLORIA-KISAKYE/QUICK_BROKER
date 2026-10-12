@@ -1,23 +1,24 @@
 import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { api } from '../utils/api';
-
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function MagicLinkSent() {
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get('email') || '';
+  const navigate = useNavigate();
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate();
+
+  const email = (location.state as { email?: string })?.email || '';
+  const magicLink = (location.state as { magicLink?: string })?.magicLink || '';
 
   const handleResend = async () => {
     setLoading(true);
     setError('');
     try {
+      const { api } = await import('../utils/api');
       await api('/auth/magic', { method: 'POST', body: { email } });
-      setError('Link sent! Check your email.');
+      setError('New link generated! Check below.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send link');
+      setError(err instanceof Error ? err.message : 'Failed to resend link');
     } finally {
       setLoading(false);
     }
@@ -31,9 +32,18 @@ export default function MagicLinkSent() {
         <p className="text-muted text-sm mt-2">
           We sent a login link to <strong>{email}</strong>
         </p>
-        <p className="text-muted text-xs mt-4">
-          Click the link in your email to log in. The link expires in 10 minutes.
-        </p>
+
+        {magicLink && (
+          <div className="mt-6 p-4 bg-white rounded-2xl border border-border">
+            <p className="text-muted text-xs mb-2">Dev mode — click your login link:</p>
+            <a
+              href={magicLink}
+              className="text-primary font-semibold text-sm underline break-all"
+            >
+              Click here to log in →
+            </a>
+          </div>
+        )}
 
         {error && <p className="text-primary text-sm mt-4">{error}</p>}
 
