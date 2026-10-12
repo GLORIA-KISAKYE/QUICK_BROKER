@@ -32,7 +32,7 @@ async function sendZeptoMail(to: string, subject: string, htmlBody: string): Pro
 }
 
 export function buildMagicLink(token: string): string {
-  const base = process.env.APP_BASE_URL || 'http://localhost:5173';
+  const base = process.env.APP_BASE_URL || 'https://quick-broker.vercel.app';
   return `${base}/auth/verify?token=${token}`;
 }
 

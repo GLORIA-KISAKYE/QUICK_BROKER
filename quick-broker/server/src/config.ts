@@ -9,7 +9,7 @@ export const config = {
   jwtRefreshSecret: process.env.JWT_REFRESH_SECRET || 'dev-refresh-secret-change-in-production',
   jwtExpiresIn: '15m',
   jwtRefreshExpiresIn: '7d',
-  corsOrigin: process.env.CORS_ORIGIN || 'http://localhost:5173',
+  corsOrigin: process.env.CORS_ORIGIN || 'https://quick-broker.vercel.app',
   zeptomailToken: process.env.ZEPTOMAIL_TOKEN || '',
   r2AccessKeyId: process.env.R2_ACCESS_KEY_ID || '',
   r2SecretAccessKey: process.env.R2_SECRET_ACCESS_KEY || '',

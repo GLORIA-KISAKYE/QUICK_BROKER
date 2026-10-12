@@ -67,7 +67,7 @@ router.post('/magic', authLimiter, async (req, res) => {
     const sent = await sendMagicLinkEmail(email, plain);
     if (!sent) return res.status(500).json({ error: 'Failed to send email' });
 
-    const magicLink = `${process.env.APP_BASE_URL || 'http://localhost:5173'}/auth/verify?token=${plain}`;
+    const magicLink = `${process.env.APP_BASE_URL || 'https://quick-broker.vercel.app'}/auth/verify?token=${plain}`;
 
     res.json({ message: 'Check your email for a login link', isNewUser, magicLink });
   } catch (error) {
