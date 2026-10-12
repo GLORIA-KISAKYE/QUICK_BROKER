@@ -9,7 +9,8 @@ interface Listing {
   rent_amount: number;
   area: string;
   distance_from_kiu: number;
-  transport_time_boda: number;
+  osrm_distance_km: number;
+  transport_info: string;
   photos: string[];
   status: string;
 }

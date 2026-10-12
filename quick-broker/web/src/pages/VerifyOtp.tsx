@@ -13,7 +13,7 @@ export default function VerifyOtp() {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const email = (location.state as { email?: string })?.email || '';
-  const role = (location.state as { role?: string })?.role || 'STUDENT';
+  // Role is handled by the magic link flow
 
   const handleChange = (index: number, value: string) => {
     if (!/^\d*$/.test(value)) return;
@@ -48,7 +48,7 @@ export default function VerifyOtp() {
         '/auth/verify-otp',
         { method: 'POST', body: { email, code: otp } }
       );
-      login(data.accessToken, data.user);
+      login(data.accessToken, data.user as { id: string; email: string; name: string; role: 'STUDENT' | 'LANDLORD' | 'ADMIN' });
       // Redirect based on role
       if (data.user.role === 'LANDLORD') {
         navigate('/landlord');

@@ -75,7 +75,7 @@ export default function Landing() {
                   className="w-full py-4 bg-white text-primary rounded-2xl font-semibold text-left px-5 shadow-lg"
                 >
                   <div className="text-lg">
-                    {(user.role as string) === 'LANDLORD' ? '🏠 Go to Landlord Dashboard' : (user.role as string) === 'ADMIN' ? '⚙️ Go to Admin Dashboard' : '🎓 Browse Listings'}
+                    {user.role === 'LANDLORD' ? '🏠 Go to Landlord Dashboard' : user.role === 'ADMIN' ? '⚙️ Go to Admin Dashboard' : '🎓 Browse Listings'}
                   </div>
                   <div className="text-sm opacity-70 mt-1">Continue as {user.name}</div>
                 </button>
