@@ -81,7 +81,7 @@ export default function Compare() {
                 <td className="p-2 text-muted">{f.label}</td>
                 {listings.map((l) => (
                   <td key={l.id} className="p-2 text-center">
-                    {f.format((l as Record<string, unknown>)[f.key] as never)}
+                    {f.format((l as unknown as Record<string, unknown>)[f.key] as never)}
                   </td>
                 ))}
               </tr>

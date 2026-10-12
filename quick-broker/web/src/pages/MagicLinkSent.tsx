@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { api } from '../utils/api';
-import { useAuth } from '../context/AuthContext';
+
 
 export default function MagicLinkSent() {
   const [searchParams] = useSearchParams();

@@ -49,7 +49,7 @@ export default function MagicLinkVerify() {
         body: { email, name, role },
       });
 
-      login(data.accessToken, data.user);
+      login(data.accessToken, data.user as { id: string; email: string; name: string; role: 'STUDENT' | 'LANDLORD' | 'ADMIN' });
       if (data.user.role === 'LANDLORD') {
         navigate('/landlord');
       } else if (data.user.role === 'ADMIN') {
