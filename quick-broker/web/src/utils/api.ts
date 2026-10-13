@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://quick-broker-api.vercel.app/api';
 
 interface RequestOptions {
   method?: string;
