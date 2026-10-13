@@ -19,6 +19,7 @@ import LandlordListings from './pages/LandlordListings';
 import LandlordInspections from './pages/LandlordInspections';
 import LandlordVerify from './pages/LandlordVerify';
 import BottomNav from './components/BottomNav';
+import InstallPrompt from './components/InstallPrompt';
 
 export default function App() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
         <Route path="/landlord/verify" element={<LandlordVerify />} />
       </Routes>
       <BottomNav />
+      <InstallPrompt />
     </div>
   );
 }
