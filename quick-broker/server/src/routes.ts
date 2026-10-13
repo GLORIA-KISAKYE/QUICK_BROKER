@@ -9,6 +9,8 @@ import savedRoutes from './modules/saved';
 import reportRoutes from './modules/reports';
 import adminRoutes from './modules/admin';
 import landlordRoutes from './modules/landlord';
+import uploadRoutes from './modules/uploads';
+import pushRoutes from './modules/push';
 import { authenticate, AuthRequest } from './middleware/auth';
 import { query } from './db';
 
@@ -24,6 +26,8 @@ router.use('/saved', savedRoutes);
 router.use('/reports', reportRoutes);
 router.use('/admin', adminRoutes);
 router.use('/landlord', landlordRoutes);
+router.use('/uploads', uploadRoutes);
+router.use('/push', pushRoutes);
 
 // Get current user
 router.get('/users/me', authenticate, async (req: AuthRequest, res) => {

@@ -46,7 +46,6 @@ self.addEventListener('fetch', (event) => {
     caches.match(request).then((cached) => {
       if (cached) return cached;
       return fetch(request).then((response) => {
-        // Cache new static assets
         if (response.ok && request.method === 'GET') {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -55,11 +54,37 @@ self.addEventListener('fetch', (event) => {
         }
         return response;
       }).catch(() => {
-        // Offline fallback
         if (request.mode === 'navigate') {
           return caches.match('/index.html');
         }
       });
     })
+  );
+});
+
+// Push notifications
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+
+  const data = event.data.json();
+  const title = data.title || 'Quick-Broker';
+  const options = {
+    body: data.body || 'You have a new notification',
+    icon: '/icon-192.svg',
+    badge: '/icon-192.svg',
+    data: { url: data.url || '/' }
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
+// Notification click
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = event.notification.data?.url || '/';
+  event.waitUntil(
+    clients.openWindow(url)
   );
 });

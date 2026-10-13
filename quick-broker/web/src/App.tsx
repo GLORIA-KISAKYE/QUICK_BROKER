@@ -20,6 +20,7 @@ import LandlordInspections from './pages/LandlordInspections';
 import LandlordVerify from './pages/LandlordVerify';
 import BottomNav from './components/BottomNav';
 import InstallPrompt from './components/InstallPrompt';
+import PushNotifications from './components/PushNotifications';
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
       </Routes>
       <BottomNav />
       <InstallPrompt />
+      <PushNotifications />
     </div>
   );
 }
